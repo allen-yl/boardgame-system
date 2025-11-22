@@ -1,8 +1,8 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
+    background-color: #35424a;
+    color: #ffffff;
 }
 
 header {
@@ -41,7 +41,7 @@ footer {
 }
 
 h1, h2, h3 {
-    color: #35424a;
+    color: #ffffff;
 }
 
 .game-card {
