@@ -12,6 +12,12 @@ header {
     text-align: center;
 }
 
+header a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1.2em;
+}
+
 nav {
     margin: 10px 0;
 }
