@@ -76,7 +76,8 @@
             { id: 2, name: "璀璨寶石 (Splendor)", category: "輕策略", players: "2-4人", price: 100, image: "images/splendor.jpg" },
             { id: 3, name: "阿瓦隆 (Avalon)", category: "陣營", players: "5-10人", price: 120, image: "images/avalon.jpg" },
             { id: 4, name: "機密代號 (Codenames)", category: "派對", players: "4-8人", price: 100, image: "images/codenames.jpg" },
-            { id: 5, name: "龍焰魔法鎮 (Flamecraft)", category: "策略", players: "1-5人", price: 180, image: "images/flamecraft.jpg" }
+            { id: 5, name: "龍焰魔法鎮 (Flamecraft)", category: "策略", players: "1-5人", price: 180, image: "images/flamecraft.jpg" },
+            { id: 6, name: "碰! (Bang!)", category: "陣營", players: "4-7人", price: 90, image: "images/bang.jpg" }
         ];
 
         const users = [
@@ -87,6 +88,22 @@
         let reservations = [
             { id: 101, userId: 1, userName: "王小明", date: "2023-12-25", time: "14:00", game: "卡坦島", status: "已確認" }
         ];
+        // 新增：localStorage 讀寫
+        function loadReservations() {
+            try {
+                const raw = localStorage.getItem('reservations');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed)) reservations = parsed;
+                }
+            } catch(e) { console.warn('載入預約失敗', e); }
+        }
+        function saveReservations() {
+            try {
+                localStorage.setItem('reservations', JSON.stringify(reservations));
+            } catch(e) { console.warn('儲存預約失敗', e); }
+        }
+        loadReservations();
 
         // --- 2. 全域狀態 (State) ---
         let currentUser = null; // null 表示訪客
@@ -430,6 +447,7 @@
                 game: formData.get('game')
             };
             reservations.push(newRes);
+            saveReservations(); // 新增
             alert("預約申請已送出！");
             navigateTo('home');
         }
@@ -460,6 +478,7 @@
         function deleteReservation(id) {
             if(confirm("確定取消？")) {
                 reservations = reservations.filter(r => r.id !== id);
+                saveReservations(); // 新增
                 renderPage('admin-reservations');
             }
         }
