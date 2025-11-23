@@ -70,11 +70,12 @@
     <!-- JavaScript 邏輯區 -->
     <script>
         // --- 1. 模擬資料庫 (Mock Data) ---
+        
         let games = [
             { id: 1, name: "卡坦島 (Catan)", category: "策略", players: "3-4人", price: 150, image: "images/catan.jpg" },
-            { id: 2, name: "璀璨寶石 (Splendor)", category: "輕策略", players: "2-4人", price: 100, image: "https://images.unsplash.com/photo-1632501641765-e568d28b0015?auto=format&fit=crop&w=500&q=60" },
-            { id: 3, name: "阿瓦隆 (Avalon)", category: "陣營", players: "5-10人", price: 120, image: "https://images.unsplash.com/photo-1533234960650-290549a9344a?auto=format&fit=crop&w=500&q=60" },
-            { id: 4, name: "機密代號 (Codenames)", category: "派對", players: "4-8人", price: 100, image: "https://images.unsplash.com/photo-1606167668584-78701c57f13d?auto=format&fit=crop&w=500&q=60" },
+            { id: 2, name: "璀璨寶石 (Splendor)", category: "輕策略", players: "2-4人", price: 100, image: "images/splendor.jpg" },
+            { id: 3, name: "阿瓦隆 (Avalon)", category: "陣營", players: "5-10人", price: 120, image: "images/avalon.jpg" },
+            { id: 4, name: "機密代號 (Codenames)", category: "派對", players: "4-8人", price: 100, image: "images/codenames.jpg" },
             { id: 5, name: "龍焰魔法鎮 (Flamecraft)", category: "策略", players: "1-5人", price: 180, image: "images/flamecraft.jpg" }
         ];
 
@@ -90,6 +91,7 @@
         // --- 2. 全域狀態 (State) ---
         let currentUser = null; // null 表示訪客
         let currentPage = 'home';
+        let categoryFilter = '全部'; // 新增：類別過濾狀態
 
         // --- 3. 核心功能函數 ---
 
@@ -248,7 +250,21 @@
                     break;
 
                 case 'games':
-                    const gamesList = games.map(game => `
+                    const categories = getCategories();
+                    const catNav = `
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            ${categories.map(c => `
+                                <button onclick="setCategoryFilter('${c}')"
+                                    class="px-3 py-1 rounded-full text-sm ${categoryFilter === c ? 'bg-indigo-600 text-white' : 'bg-gray-200 hover:bg-gray-300'}">
+                                    ${c}
+                                </button>
+                            `).join('')}
+                        </div>
+                    `;
+                    const filteredGames = categoryFilter === '全部'
+                        ? games
+                        : games.filter(g => g.category === categoryFilter);
+                    const gamesList = filteredGames.map(game => `
                         <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition flex flex-col">
                             <div class="h-48 bg-gray-200 relative">
                                 <img src="${game.image}" alt="${game.name}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/400x300?text=Game'">
@@ -269,8 +285,12 @@
                     
                     root.innerHTML = `
                         <div class="max-w-7xl mx-auto px-4 py-8">
-                            <h2 class="text-3xl font-bold mb-8 text-gray-800 border-l-8 border-indigo-600 pl-4">桌遊清單</h2>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">${gamesList}</div>
+                            <h2 class="text-3xl font-bold mb-4 text-gray-800 border-l-8 border-indigo-600 pl-4">桌遊清單</h2>
+                            ${catNav}
+                            ${filteredGames.length
+                                ? `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">${gamesList}</div>`
+                                : `<div class="text-center text-gray-500 py-20">無「${categoryFilter}」類別的桌遊。</div>`
+                            }
                         </div>
                     `;
                     break;
@@ -442,6 +462,15 @@
                 reservations = reservations.filter(r => r.id !== id);
                 renderPage('admin-reservations');
             }
+        }
+
+        function getCategories() {
+            return ['全部', ...new Set(games.map(g => g.category))];
+        }
+
+        function setCategoryFilter(cat) {
+            categoryFilter = cat;
+            renderPage('games');
         }
 
         // 啟動
