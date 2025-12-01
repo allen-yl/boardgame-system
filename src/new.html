@@ -68,6 +68,9 @@
             text-shadow: 0 0 10px #00ffff, 0 0 20px #ff00ff;
             font-weight: bold;
         }
+        h2 {
+            color: #ffffff;
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen font-sans text-gray-800">
@@ -360,7 +363,7 @@
                     
                     root.innerHTML = `
                         <div class="max-w-7xl mx-auto px-4 py-8">
-                            <h2 class="text-3xl font-bold mb-4 text-gray-800 border-l-8 border-indigo-600 pl-4">桌遊清單</h2>
+                            <h2 class="text-3xl font-bold mb-4 text-white-800 border-l-8 border-indigo-600 pl-4">桌遊清單</h2>
                             ${catNav}
                             ${filteredGames.length
                                 ? `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">${gamesList}</div>`
@@ -374,7 +377,7 @@
                     root.innerHTML = `
                         <div class="min-h-[80vh] flex items-center justify-center px-4">
                             <div class="bg-white p-8 rounded-xl shadow-xl w-full max-w-md">
-                                <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">會員登入</h2>
+                                <h2 class="text-2xl font-bold text-center text-white-800 mb-6">會員登入</h2>
                                 <form onsubmit="login(event)" class="space-y-6">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">帳號</label>
@@ -445,7 +448,7 @@
                     
                     root.innerHTML = `
                         <div class="max-w-6xl mx-auto px-4 py-8">
-                            <h2 class="text-2xl font-bold text-gray-800 mb-6">後台：桌遊管理</h2>
+                            <h2 class="text-2xl font-bold text-white mb-6">後台：桌遊管理</h2>
                             <div class="bg-gray-100 p-6 rounded-lg mb-8 border flex flex-wrap gap-4 items-end">
                                 <div><label class="text-xs text-gray-500">名稱</label><input id="newGameName" class="p-2 border rounded w-full"></div>
                                 <div><label class="text-xs text-gray-500">類別</label><input id="newGameCat" class="p-2 border rounded w-full" value="策略"></div>
