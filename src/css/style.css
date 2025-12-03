@@ -1,0 +1,212 @@
+/* 自定義動畫效果 */
+.animate-fade-in { animation: fadeIn 0.5s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* 隱藏捲軸但保持功能 */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* 街機主題背景 */
+body {
+    background-color: #0a0e27;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            rgba(255, 0, 255, 0.1) 0px,
+            rgba(255, 0, 255, 0.1) 2px,
+            transparent 2px,
+            transparent 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            rgba(0, 255, 255, 0.05) 0px,
+            rgba(0, 255, 255, 0.05) 1px,
+            transparent 1px,
+            transparent 3px
+        ),
+        linear-gradient(135deg, #1a0033 0%, #0a0e27 50%, #001a33 100%);
+    background-attachment: fixed;
+    box-shadow: inset 0 0 60px rgba(255, 0, 255, 0.15);
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* 霓虹光暈效果 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 50%, rgba(255, 0, 127, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 255, 255, 0.15) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* 確保主要內容顯示在最上層 */
+main {
+    position: relative;
+    z-index: 1;
+}
+
+.pixel-text {
+    font-family: 'Press Start 2P', cursive;
+    image-rendering: pixelated;
+}
+
+/* 街機風格文字 */
+.arcade-text {
+    color: #00ffff;
+    text-shadow: 0 0 10px #00ffff, 0 0 20px #ff00ff;
+    font-weight: bold;
+}
+
+h2 {
+    color: #ffffff;
+}
+
+/* 聊天機器人樣式 */
+.chatbot-toggle {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 60;
+}
+
+.chatbot-panel {
+    position: fixed;
+    right: 24px;
+    bottom: 84px;
+    width: 360px;
+    max-height: 600px;
+    background: linear-gradient(180deg, rgba(10,14,39,0.98), rgba(6,8,30,0.98));
+    border: 1px solid rgba(255,255,255,0.06);
+    color: #e6f7ff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 20px rgba(0,255,255,0.04);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 60;
+}
+
+.chatbot-header {
+    padding: 10px 12px;
+    background: linear-gradient(90deg, rgba(0,255,255,0.06), rgba(255,0,255,0.03));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.chatbot-body {
+    padding: 16px;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.chat-msg {
+    max-width: 78%;
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.3;
+    word-break: break-word;
+}
+
+.chat-msg.user { background: linear-gradient(90deg,#7dd3fc,#60a5fa); color: #04203a; align-self: flex-end; }
+.chat-msg.bot { background: rgba(255,255,255,0.06); color: #e6f7ff; align-self: flex-start; }
+.chatbot-input-wrap { display:flex; gap:8px; padding:10px; border-top:1px solid rgba(255,255,255,0.03); background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent); }
+.chatbot-input { flex:1; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.02); color: #e6f7ff; outline:none }
+.chatbot-send { background:#06b6d4; color:#04203a; padding:8px 10px; border-radius:8px; font-weight:600; }
+
+/* --- 3D 輪播樣式 --- */
+.carousel-wrap { 
+    position: relative; 
+    margin: 0 auto; 
+    height: 360px; /* 稍微加高以容納立體效果 */
+    perspective: 1000px; /* 3D 透視點，數字越小3D感越強 */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.carousel-stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d; /* 保留 3D 空間 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.carousel-item {
+    position: absolute;
+    width: 60%; /* 中央圖片寬度 */
+    height: 80%; /* 圖片高度 */
+    background-size: cover;
+    background-position: center;
+    border-radius: 15px;
+    transition: all 0.5s ease-out; /* 動畫平滑過渡 */
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    /* 加上一點鏡面反射效果 */
+    -webkit-box-reflect: below 1px linear-gradient(transparent, transparent #0004);
+}
+
+/* 圖片內的文字標籤 */
+.carousel-neon {
+    position: absolute;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    padding: 8px 16px;
+    border-radius: 20px;
+    color: #fff;
+    font-weight: bold;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    backdrop-filter: blur(4px);
+    opacity: 0; 
+    transition: opacity 0.3s;
+}
+
+/* 只有中間那張顯示文字 */
+.carousel-item.active .carousel-neon {
+    opacity: 1;
+}
+
+/* 左右控制按鈕 */
+.carousel-controls { 
+    position: absolute; 
+    inset: 0; 
+    pointer-events: none; 
+    z-index: 50; 
+}
+.carousel-controls button { 
+    pointer-events: auto; 
+    position: absolute; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    background: rgba(255,255,255,0.1); 
+    border: 1px solid rgba(255,255,255,0.2); 
+    color: #fff; 
+    padding: 12px; 
+    border-radius: 50%; 
+    backdrop-filter: blur(4px); 
+    transition: 0.3s;
+}
+.carousel-controls button:hover {
+    background: rgba(0, 255, 255, 0.4);
+    box-shadow: 0 0 15px #00ffff;
+}
+.carousel-controls .prev { left: 20px; }
+.carousel-controls .next { right: 20px; }

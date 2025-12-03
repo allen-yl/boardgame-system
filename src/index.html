@@ -3,61 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>桌遊網站</title>
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/components.css">
+    <title>圈圈桌遊店 - 官方網站</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-    <header>
-        <div class="doodle dice">🎲</div>
-        <div class="doodle chess">♟️</div>
-        <h1>🎮 桌遊中心 🎯</h1>
-        <nav>
-            <a href="#home">首頁</a>
-            <a href="pages/games.html">遊戲</a>
-            <a href="pages/about.html">關於我們</a>
-            <a href="pages/contact.html">聯絡方式</a>
-        </nav>
-    </header>   
-    
-    <main>
-        <div class="hero-section">
-            <div class="doodle card">🃏</div>
-            <div class="doodle trophy">🏆</div>
-            <h1>歡迎來到桌遊網站</h1>
-            <p>您的桌遊一站式目的地！</p>
-            <div class="doodle-row">
-                <span class="doodle">🎲</span>
-                <span class="doodle">♠️</span>
-                <span class="doodle">♥️</span>
-                <span class="doodle">♦️</span>
-                <span class="doodle">♣️</span>
+<body class="flex flex-col min-h-screen font-sans text-gray-800">
+
+    <nav class="bg-transparent shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center cursor-pointer" onclick="renderPage('home')">
+                    <div class="bg-indigo-600 text-white p-2 rounded-full mr-2">
+                        <i data-lucide="gamepad-2"></i>
+                    </div>
+                    <span class="font-bold text-xl text-white">圈圈桌遊店</span>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-4" id="desktop-menu">
+                    </div>
+
+                <div class="md:hidden flex items-center">
+                    <button onclick="toggleMobileMenu()" class="text-gray-600">
+                        <i data-lucide="menu"></i>
+                    </button>
+                </div>
             </div>
         </div>
-        
-        <section class="game-categories">
-            <div class="category-card">
-                <h3>🎯 策略遊戲</h3>
-                <p>燒腦挑戰</p>
+        <div id="mobile-menu" class="hidden md:hidden bg-transparent border-t px-2 pt-2 pb-3 space-y-1 shadow-inner">
             </div>
-            <div class="category-card">
-                <h3>🎪 派對遊戲</h3>
-                <p>歡樂無限</p>
+    </nav>
+
+    <main id="app-root" class="flex-grow animate-fade-in">
+        </main>
+
+    <div class="chatbot-toggle">
+        <button id="chatToggleBtn" onclick="toggleChat()" class="bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-full shadow-lg" title="開啟客服">
+            <i data-lucide="message-square" class="w-5 h-5"></i>
+        </button>
+    </div>
+
+    <div id="chatbotPanel" class="chatbot-panel hidden" aria-hidden="true">
+        <div class="chatbot-header">
+            <div class="flex items-center gap-2">
+                <i data-lucide="robot" class="w-5 h-5 text-cyan-300"></i>
+                <div>
+                    <div class="font-bold">小圈機器人</div>
+                    <div class="text-xs text-gray-300">客服助理 • 可詢問營業時間與預約</div>
+                </div>
             </div>
-            <div class="category-card">
-                <h3>🧩 益智遊戲</h3>
-                <p>考驗智慧</p>
+            <div>
+                <button onclick="toggleChat()" class="text-gray-300 hover:text-white px-2 py-1 rounded"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-        </section>
-    </main>
-    
-    <footer>
-        <div class="doodle meeple">🧍</div>
-        <p>&copy; 2025 桌遊網站。版權所有。</p>
+        </div>
+        <div id="chatBody" class="chatbot-body">
+            </div>
+        <div class="chatbot-input-wrap">
+            <input id="chatInput" class="chatbot-input" type="text" placeholder="輸入訊息並按 Enter 或按送出" aria-label="訊息輸入">
+            <button id="chatSendBtn" class="chatbot-send" onclick="sendChatFromInput()">送出</button>
+        </div>
+    </div>
+
+    <footer class="bg-gray-800 text-gray-300 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="flex justify-center space-x-6 mb-4">
+                <span class="hover:text-white cursor-pointer">關於我們</span>
+                <span class="hover:text-white cursor-pointer">聯絡方式</span>
+                <span class="hover:text-white cursor-pointer">隱私權政策</span>
+            </div>
+            <p class="text-sm">© 2023 圈圈桌遊店 Circle Board Game Store. All rights reserved.</p>
+        </div>
     </footer>
 
-    <script src="js/app.js"></script>
-    <script src="js/game.js"></script>
-    <script src="js/utils.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>
