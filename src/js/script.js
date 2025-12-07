@@ -852,7 +852,12 @@ function initCarousel() {
     const stage = document.querySelector('.carousel-stage');
     if (!stage) return;
 
-    carouselItemsData = games.slice(0, 7); 
+    // --- 修改重點：拿掉 .slice(0, 7)，改為顯示全部 ---
+    // [...games]：複製一份陣列
+    // .reverse()：反轉，讓最新的遊戲排在最前面
+    carouselItemsData = [...games].reverse(); 
+    // ---------------------------------------------
+
     if (carouselItemsData.length === 0) {
         stage.innerHTML = '<div style="color:#fff;">暫無圖片</div>';
         return;
@@ -864,13 +869,16 @@ function initCarousel() {
         </div>
     `).join('');
 
+    // 初始化位置
     carouselIndex = Math.floor(carouselItemsData.length / 2); 
     update3DCarousel();
     startCarousel();
     
     const wrap = document.querySelector('.carousel-wrap');
-    wrap.addEventListener('mouseenter', stopCarousel);
-    wrap.addEventListener('mouseleave', startCarousel);
+    if(wrap) {
+        wrap.addEventListener('mouseenter', stopCarousel);
+        wrap.addEventListener('mouseleave', startCarousel);
+    }
 }
 
 function update3DCarousel() {
