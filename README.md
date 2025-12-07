@@ -5,28 +5,14 @@ This project is a board game website that showcases various board games, providi
 
 ## Project Structure
 ```
-boardgame-website
-├── src
-│   ├── index.html
-│   ├── css
-│   │   ├── main.css
-│   │   └── components.css
-│   ├── js
-│   │   ├── app.js
-│   │   ├── game.js
-│   │   └── utils.js
-│   ├── components
-│   │   ├── header.html
-│   │   ├── footer.html
-│   │   └── game-card.html
-│   └── pages
-│       ├── about.html
-│       ├── games.html
-│       └── contact.html
-├── assets
-│   └── icons
-├── package.json
-└── README.md
+circle-boardgame-website
+├── css
+│   └── style.css        # Custom styles, animations, and 3D effects
+├── js
+│   └── script.js        # Core logic, CRUD operations, and DOM manipulation
+├── images               # (Optional) Directory for game images
+├── index.html           # Main entry point with Tailwind & Lucide imports
+└── README.md            # Project documentation
 ```
 
 ## Features

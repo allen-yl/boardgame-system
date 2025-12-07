@@ -1,6 +1,6 @@
 // --- 1. 模擬資料庫 (Mock Data) & 全域變數 ---
 
-// 預設資料 (包含詳細介紹)
+// 預設資料
 const defaultGames = [
     { 
         id: 1, 
@@ -107,28 +107,36 @@ let currentUser = null;
 let currentPage = 'home';
 let categoryFilter = '全部';
 let currentCaptcha = ''; 
+let searchQuery = ''; 
 
-// --- 讀寫函數 (加強版) ---
+// --- 讀寫函數 ---
 function loadAllData() {
-    // 載入桌遊
     const storedGames = localStorage.getItem('games');
-    games = storedGames ? JSON.parse(storedGames) : [...defaultGames]; 
-    if (!storedGames) saveGames(); 
+    if (storedGames) {
+        let parsedGames = JSON.parse(storedGames);
+        games = parsedGames.map(game => {
+            const defaultGame = defaultGames.find(d => d.id === game.id);
+            if (defaultGame && !game.description) {
+                return { ...game, description: defaultGame.description };
+            }
+            return game;
+        });
+        saveGames();
+    } else {
+        games = [...defaultGames];
+        saveGames(); 
+    }
 
-    // 載入使用者
     const storedUsers = localStorage.getItem('users');
     users = storedUsers ? JSON.parse(storedUsers) : [...defaultUsers];
     if (!storedUsers) saveUsers();
 
-    // 載入預約
     const storedRes = localStorage.getItem('reservations');
     reservations = storedRes ? JSON.parse(storedRes) : [];
     
-    // 載入當前登入者
     const storedCurr = localStorage.getItem('currentUser');
     if (storedCurr) {
         const parsedUser = JSON.parse(storedCurr);
-        // 檢查該使用者是否還在使用者名單中
         const validUser = users.find(u => u.id === parsedUser.id);
         currentUser = validUser || null;
     }
@@ -145,9 +153,7 @@ function saveCurrentUser() {
 // --- 核心功能函數 ---
 
 function init() {
-    loadAllData(); // 確保資料載入
-    
-    // 清除舊聊天記錄 (可選)
+    loadAllData();
     try { localStorage.removeItem('chatMessages'); } catch(e) {}
     chatMessages = [];
     addMessage('bot', '哈囉！我是小圈機器人，歡迎來到圈圈桌遊店。');
@@ -157,7 +163,6 @@ function init() {
     renderPage('home');
     lucide.createIcons();
     
-    // 延遲初始化輪播
     setTimeout(() => {
         try { initCarousel(); } catch(e) { console.error(e); }
     }, 100);
@@ -170,7 +175,6 @@ function login(event) {
     const username = form.username.value;
     const password = form.password.value;
     
-    // 強制重讀最新使用者資料
     loadAllData();
 
     const user = users.find(u => u.username === username && u.password === password);
@@ -196,28 +200,24 @@ function register(event) {
     const confirmPassword = form.confirmPassword.value;
     const captchaInput = form.captcha.value;
     
-    // --- 驗證碼檢查 ---
     if (captchaInput !== currentCaptcha) {
         alert("驗證碼錯誤，請重新輸入！");
-        form.captcha.value = ''; // 清空錯誤的輸入
-        refreshCaptcha();        // 錯誤時自動刷新驗證碼
-        form.captcha.focus();    // 讓游標回到輸入框
+        form.captcha.value = ''; 
+        refreshCaptcha();        
+        form.captcha.focus();    
         return;
     }
 
-    // 驗證密碼一致性
     if (password !== confirmPassword) {
         alert("密碼和確認密碼不一致");
         return;
     }
     
-    // 檢查帳號是否已存在
     if (users.find(u => u.username === username)) {
         alert("此帳號已被使用，請選擇其他帳號");
         return;
     }
     
-    // 建立新使用者
     const newUser = {
         id: Date.now(),
         username,
@@ -236,21 +236,16 @@ function register(event) {
     renderPage('home');
 }
 
-// 刷新驗證碼
 function refreshCaptcha() {
-    // 產生新的 4 位亂數
     currentCaptcha = Math.floor(1000 + Math.random() * 9000).toString();
-    // 更新畫面上顯示的數字
     const display = document.getElementById('captchaDisplay');
     if (display) {
         display.textContent = currentCaptcha;
-        // 加入一點閃爍動畫提示已更新
         display.classList.add('bg-gray-300');
         setTimeout(() => display.classList.remove('bg-gray-300'), 200);
     }
 }
 
-// 登出
 function logout() {
     currentUser = null;
     saveCurrentUser();
@@ -258,41 +253,30 @@ function logout() {
     renderPage('home');
 }
 
-
-// 導航跳轉
 function navigateTo(page) {
-    // 權限檢查：訪客想點預約
     if (!currentUser && page === 'reservation') {
         alert("請先登入會員才能進行線上預約！");
         renderPage('login');
         return;
     }
+    // 切換頁面時保留搜尋狀態體驗較好
     renderPage(page);
-    // 關閉手機選單
     const mobileMenu = document.getElementById('mobile-menu');
     if(mobileMenu) mobileMenu.classList.add('hidden');
 }
 
-// 手機選單切換
 function toggleMobileMenu() {
     const menu = document.getElementById('mobile-menu');
     menu.classList.toggle('hidden');
 }
 
-// --- 4. 頁面渲染邏輯 (View Rendering) ---
-
-// 渲染導覽列
 function renderNavbar() {
     const desktopMenu = document.getElementById('desktop-menu');
     const mobileMenu = document.getElementById('mobile-menu');
     const role = currentUser?.role || 'guest';
     
-    let menuItems = '';
-    
-    // 共同項目
-    menuItems += `<button onclick="navigateTo('home')" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-100 hover:text-indigo-700 transition">首頁</button>`;
+    let menuItems = `<button onclick="navigateTo('home')" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-100 hover:text-indigo-700 transition">首頁</button>`;
 
-    // 根據身分
     if (role === 'admin') {
         menuItems += `
             <button onclick="navigateTo('admin-games')" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-100 hover:text-indigo-700 transition">桌遊管理</button>
@@ -306,7 +290,6 @@ function renderNavbar() {
         `;
     }
 
-    // 桌面版右側 (登入狀態)
     let rightSide = '';
     if (currentUser) {
         rightSide = `
@@ -333,7 +316,6 @@ function renderNavbar() {
 
     if (desktopMenu) desktopMenu.innerHTML = menuItems + rightSide;
     
-    // 手機版選單簡單處理
     if (mobileMenu) {
         mobileMenu.innerHTML = menuItems + (currentUser ? 
             `<div class="border-t pt-2 mt-2"><button onclick="logout()" class="w-full text-left px-3 py-2 text-red-600">登出 (${currentUser.name})</button></div>` : 
@@ -344,11 +326,10 @@ function renderNavbar() {
     lucide.createIcons();
 }
 
-// 渲染主頁面
 function renderPage(page) {
     currentPage = page;
     const root = document.getElementById('app-root');
-    root.innerHTML = ''; // 清空內容
+    root.innerHTML = ''; 
 
     switch(page) {
         case 'home':
@@ -381,7 +362,6 @@ function renderPage(page) {
                     </div>
 
                     <div class="max-w-7xl mx-auto px-4 grid md:grid-cols-3 gap-8">
-                        
                         <div class="group bg-white p-8 rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-3 hover:shadow-2xl hover:shadow-indigo-500/40 border-b-0 hover:border-b-4 border-indigo-500 relative overflow-hidden flex flex-col items-center text-center">
                             <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-100 rounded-bl-full -mr-4 -mt-4 opacity-50 transition-transform group-hover:scale-150 duration-500"></div>
                             <div class="relative inline-block p-4 bg-indigo-100 text-indigo-600 rounded-full mb-4 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white">
@@ -390,7 +370,6 @@ function renderPage(page) {
                             <h3 class="text-2xl font-bold mb-2 group-hover:text-indigo-600 transition-colors">海量桌遊</h3>
                             <p class="text-lg text-gray-600">超過 500 款桌遊任你挑選。</p>
                         </div>
-
                         <div class="group bg-white p-8 rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-3 hover:shadow-2xl hover:shadow-green-500/40 border-b-0 hover:border-b-4 border-green-500 relative overflow-hidden flex flex-col items-center text-center">
                             <div class="absolute top-0 right-0 w-24 h-24 bg-green-100 rounded-bl-full -mr-4 -mt-4 opacity-50 transition-transform group-hover:scale-150 duration-500"></div>
                             <div class="relative inline-block p-4 bg-green-100 text-green-600 rounded-full mb-4 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:bg-green-600 group-hover:text-white">
@@ -399,7 +378,6 @@ function renderPage(page) {
                             <h3 class="text-2xl font-bold mb-2 group-hover:text-green-600 transition-colors">舒適空間</h3>
                             <p class="text-lg text-gray-600">寬敞桌椅與明亮照明。</p>
                         </div>
-
                         <div class="group bg-white p-8 rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-3 hover:shadow-2xl hover:shadow-orange-500/40 border-b-0 hover:border-b-4 border-orange-500 relative overflow-hidden flex flex-col items-center text-center">
                             <div class="absolute top-0 right-0 w-24 h-24 bg-orange-100 rounded-bl-full -mr-4 -mt-4 opacity-50 transition-transform group-hover:scale-150 duration-500"></div>
                             <div class="relative inline-block p-4 bg-orange-100 text-orange-600 rounded-full mb-4 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:bg-orange-600 group-hover:text-white">
@@ -408,7 +386,6 @@ function renderPage(page) {
                             <h3 class="text-2xl font-bold mb-2 group-hover:text-orange-600 transition-colors">線上預約</h3>
                             <p class="text-lg text-gray-600">會員專屬預約系統。</p>
                         </div>
-
                     </div>
                     
                     <div class="bg-gray-100 py-8 px-4 text-center shadow-md">
@@ -422,20 +399,24 @@ function renderPage(page) {
         case 'games':
             const categories = getCategories();
             const catNav = `
-                <div class="flex flex-wrap gap-2 mb-6">
+                <div class="flex flex-wrap gap-2 items-center">
+                    <span class="mr-2 text-gray-600 font-bold text-sm">分類：</span>
                     ${categories.map(c => `
                         <button onclick="setCategoryFilter('${c}')"
-                            class="px-3 py-1 rounded-full text-sm ${categoryFilter === c ? 'bg-indigo-600 text-white' : 'bg-gray-200 hover:bg-gray-300'}">
+                            class="px-3 py-1 rounded-full text-sm transition ${categoryFilter === c ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}">
                             ${c}
                         </button>
                     `).join('')}
                 </div>
             `;
-            const filteredGames = categoryFilter === '全部'
-                ? games
-                : games.filter(g => g.category === categoryFilter);
             
-            // 加入 onclick 觸發 openGameModal
+            // 篩選邏輯
+            const filteredGames = games.filter(g => {
+                const matchCat = categoryFilter === '全部' || g.category === categoryFilter;
+                const matchSearch = g.name.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchCat && matchSearch;
+            });
+            
             const gamesList = filteredGames.map(game => `
                 <div onclick="openGameModal(${game.id})" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition flex flex-col cursor-pointer transform hover:-translate-y-1">
                     <div class="h-48 bg-gray-200 relative">
@@ -456,14 +437,55 @@ function renderPage(page) {
             
             root.innerHTML = `
                 <div class="max-w-7xl mx-auto px-4 py-8">
-                    <h2 class="text-3xl font-bold mb-4 text-white-800 border-l-8 border-indigo-600 pl-4">桌遊清單</h2>
-                    ${catNav}
+                    <h2 class="text-3xl font-bold mb-6 text-white-800 border-l-8 border-indigo-600 pl-4">桌遊清單</h2>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-md mb-8">
+                        
+                        <div class="mb-6">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">搜尋桌遊</label>
+                            <div class="flex gap-2">
+                                <input 
+                                    type="text" 
+                                    id="searchInput"
+                                    value="${searchQuery}" 
+                                    onkeydown="if(event.key === 'Enter') performSearch()"
+                                    placeholder="輸入名稱後按 Enter 或點擊搜尋..." 
+                                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                                >
+                                <button onclick="performSearch()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center">
+                                    <i data-lucide="search" class="w-5 h-5 mr-1"></i> 搜尋
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-gray-200 my-4"></div>
+                        
+                        <div>
+                            ${catNav}
+                        </div>
+                    </div>
+
                     ${filteredGames.length
-                        ? `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">${gamesList}</div>`
-                        : `<div class="text-center text-gray-500 py-20">無「${categoryFilter}」類別的桌遊。</div>`
+                        ? `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-fade-in">${gamesList}</div>`
+                        : `<div class="text-center text-gray-500 py-20 bg-white rounded-xl shadow-inner">
+                                <i data-lucide="ghost" class="w-12 h-12 mx-auto mb-2 opacity-50"></i>
+                                <p>找不到符合條件的桌遊</p>
+                           </div>`
                     }
                 </div>
             `;
+            
+            // 讓搜尋框在重新渲染後不要自動聚焦，以免手機版跳出鍵盤擋住視線
+            // 如果你希望每次按搜尋都自動對焦，可以把下面這段解開
+            /*
+            const input = document.getElementById('searchInput');
+            if(input) {
+                input.focus();
+                const val = input.value; 
+                input.value = ''; 
+                input.value = val; 
+            }
+            */
             break;
 
         case 'login':
@@ -588,7 +610,6 @@ function renderPage(page) {
             const allCategories = ['全部', ...new Set(games.map(g => g.category))];
             const categoryOptions = allCategories.filter(c => c !== '全部').map(cat => `<option value="${cat}">${cat}</option>`).join('');
             
-            // 修改重點：加入 遊戲介紹 的輸入框
             root.innerHTML = `
                 <div class="max-w-6xl mx-auto px-4 py-8">
                     <h2 class="text-2xl font-bold text-white mb-6">後台：桌遊管理</h2>
@@ -681,6 +702,16 @@ function renderPage(page) {
 }
 
 // --- 5. 資料操作邏輯 ---
+
+// --- 新增：按下 Enter 或 搜尋按鈕 時才執行 ---
+function performSearch() {
+    const input = document.getElementById('searchInput');
+    if(input) {
+        searchQuery = input.value.trim();
+        // 執行搜尋並重新渲染
+        renderPage('games');
+    }
+}
 
 function submitReservation(e) {
     e.preventDefault();
@@ -884,12 +915,7 @@ function initCarousel() {
     const stage = document.querySelector('.carousel-stage');
     if (!stage) return;
 
-    // --- 修改重點：拿掉 .slice(0, 7)，改為顯示全部 ---
-    // [...games]：複製一份陣列
-    // .reverse()：反轉，讓最新的遊戲排在最前面
     carouselItemsData = [...games].reverse(); 
-    // ---------------------------------------------
-
     if (carouselItemsData.length === 0) {
         stage.innerHTML = '<div style="color:#fff;">暫無圖片</div>';
         return;
@@ -901,16 +927,13 @@ function initCarousel() {
         </div>
     `).join('');
 
-    // 初始化位置
     carouselIndex = Math.floor(carouselItemsData.length / 2); 
     update3DCarousel();
     startCarousel();
     
     const wrap = document.querySelector('.carousel-wrap');
-    if(wrap) {
-        wrap.addEventListener('mouseenter', stopCarousel);
-        wrap.addEventListener('mouseleave', startCarousel);
-    }
+    wrap.addEventListener('mouseenter', stopCarousel);
+    wrap.addEventListener('mouseleave', startCarousel);
 }
 
 function update3DCarousel() {
