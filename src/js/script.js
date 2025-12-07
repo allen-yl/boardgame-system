@@ -77,42 +77,22 @@ let categoryFilter = '全部';
 let currentCaptcha = ''; 
 
 // --- 讀寫函數 (加強版) ---
-// --- 讀寫函數 (自動修復版) ---
 function loadAllData() {
-    // 1. 載入桌遊 (新增自動補全介紹的邏輯)
+    // 載入桌遊
     const storedGames = localStorage.getItem('games');
-    
-    if (storedGames) {
-        let parsedGames = JSON.parse(storedGames);
-        
-        // 遍歷存檔的遊戲，如果是預設遊戲 (ID 1~7) 且缺少 description，就從 defaultGames 補回來
-        games = parsedGames.map(game => {
-            const defaultGame = defaultGames.find(d => d.id === game.id);
-            if (defaultGame && !game.description) {
-                // 補上介紹
-                return { ...game, description: defaultGame.description };
-            }
-            return game;
-        });
-        
-        // 將修復後的資料存回硬碟，這樣下次就不用再修了
-        saveGames();
-    } else {
-        // 如果完全沒有存檔，直接使用新的預設資料
-        games = [...defaultGames];
-        saveGames(); 
-    }
+    games = storedGames ? JSON.parse(storedGames) : [...defaultGames]; 
+    if (!storedGames) saveGames(); 
 
-    // 2. 載入使用者
+    // 載入使用者
     const storedUsers = localStorage.getItem('users');
     users = storedUsers ? JSON.parse(storedUsers) : [...defaultUsers];
     if (!storedUsers) saveUsers();
 
-    // 3. 載入預約
+    // 載入預約
     const storedRes = localStorage.getItem('reservations');
     reservations = storedRes ? JSON.parse(storedRes) : [];
     
-    // 4. 載入當前登入者
+    // 載入當前登入者
     const storedCurr = localStorage.getItem('currentUser');
     if (storedCurr) {
         const parsedUser = JSON.parse(storedCurr);
@@ -471,10 +451,6 @@ function renderPage(page) {
                             </div>
                             <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition">登入</button>
                         </form>
-                        <div class="mt-6 bg-blue-50 p-4 rounded text-sm text-blue-800">
-                            <p>管理員: admin / admin</p>
-                            <p>會員: user / user</p>
-                        </div>
                         <div class="mt-6 text-center border-t pt-6">
                             <p class="text-gray-600 text-sm mb-3">還沒有帳號？</p>
                             <button onclick="navigateTo('register')" class="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition">註冊會員</button>
@@ -580,6 +556,7 @@ function renderPage(page) {
             const allCategories = ['全部', ...new Set(games.map(g => g.category))];
             const categoryOptions = allCategories.filter(c => c !== '全部').map(cat => `<option value="${cat}">${cat}</option>`).join('');
             
+            // 修改重點：加入 遊戲介紹 的輸入框
             root.innerHTML = `
                 <div class="max-w-6xl mx-auto px-4 py-8">
                     <h2 class="text-2xl font-bold text-white mb-6">後台：桌遊管理</h2>
