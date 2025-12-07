@@ -91,6 +91,21 @@ h2 {
     flex-direction: column;
     overflow: hidden;
     z-index: 60;
+    
+    /* 動畫設定 */
+    transform-origin: bottom right;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: scale(0);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.chatbot-panel.open {
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
 }
 
 .chatbot-header {
@@ -130,8 +145,8 @@ h2 {
 .carousel-wrap { 
     position: relative; 
     margin: 0 auto; 
-    height: 360px; /* 稍微加高以容納立體效果 */
-    perspective: 1000px; /* 3D 透視點，數字越小3D感越強 */
+    height: 360px; 
+    perspective: 1000px; 
     overflow: hidden;
     display: flex;
     justify-content: center;
@@ -142,7 +157,7 @@ h2 {
     position: relative;
     width: 100%;
     height: 100%;
-    transform-style: preserve-3d; /* 保留 3D 空間 */
+    transform-style: preserve-3d; 
     display: flex;
     justify-content: center;
     align-items: center;
@@ -150,19 +165,17 @@ h2 {
 
 .carousel-item {
     position: absolute;
-    width: 60%; /* 中央圖片寬度 */
-    height: 80%; /* 圖片高度 */
+    width: 60%; 
+    height: 80%; 
     background-size: cover;
     background-position: center;
     border-radius: 15px;
-    transition: all 0.5s ease-out; /* 動畫平滑過渡 */
+    transition: all 0.5s ease-out; 
     cursor: pointer;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    /* 加上一點鏡面反射效果 */
     -webkit-box-reflect: below 1px linear-gradient(transparent, transparent #0004);
 }
 
-/* 圖片內的文字標籤 */
 .carousel-neon {
     position: absolute;
     left: 50%;
@@ -179,12 +192,10 @@ h2 {
     transition: opacity 0.3s;
 }
 
-/* 只有中間那張顯示文字 */
 .carousel-item.active .carousel-neon {
     opacity: 1;
 }
 
-/* 左右控制按鈕 */
 .carousel-controls { 
     position: absolute; 
     inset: 0; 
@@ -210,3 +221,40 @@ h2 {
 }
 .carousel-controls .prev { left: 20px; }
 .carousel-controls .next { right: 20px; }
+
+/* --- 遊戲詳情 Modal 樣式 (新增) --- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6); /* 半透明黑色背景 */
+    backdrop-filter: blur(4px);     /* 背景模糊效果 */
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: white;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 16px;
+    padding: 0; /* 內距由內部元素控制 */
+    transform: scale(0.8);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+.modal-overlay.open .modal-content {
+    transform: scale(1);
+}

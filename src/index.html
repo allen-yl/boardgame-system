@@ -21,7 +21,7 @@
                 </div>
 
                 <div class="hidden md:flex items-center space-x-4" id="desktop-menu">
-                    </div>
+                </div>
 
                 <div class="md:hidden flex items-center">
                     <button onclick="toggleMobileMenu()" class="text-gray-600">
@@ -31,11 +31,11 @@
             </div>
         </div>
         <div id="mobile-menu" class="hidden md:hidden bg-transparent border-t px-2 pt-2 pb-3 space-y-1 shadow-inner">
-            </div>
+        </div>
     </nav>
 
     <main id="app-root" class="flex-grow animate-fade-in">
-        </main>
+    </main>
 
     <div class="chatbot-toggle">
         <button id="chatToggleBtn" onclick="toggleChat()" class="bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-full shadow-lg" title="開啟客服">
@@ -43,7 +43,7 @@
         </button>
     </div>
 
-    <div id="chatbotPanel" class="chatbot-panel hidden" aria-hidden="true">
+    <div id="chatbotPanel" class="chatbot-panel" aria-hidden="true">
         <div class="chatbot-header">
             <div class="flex items-center gap-2">
                 <i data-lucide="robot" class="w-5 h-5 text-cyan-300"></i>
@@ -57,10 +57,22 @@
             </div>
         </div>
         <div id="chatBody" class="chatbot-body">
-            </div>
+        </div>
         <div class="chatbot-input-wrap">
             <input id="chatInput" class="chatbot-input" type="text" placeholder="輸入訊息並按 Enter 或按送出" aria-label="訊息輸入">
             <button id="chatSendBtn" class="chatbot-send" onclick="sendChatFromInput()">送出</button>
+        </div>
+    </div>
+
+    <div id="gameModalOverlay" class="modal-overlay" onclick="closeGameModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="relative">
+                <button onclick="closeGameModal()" class="absolute top-0 right-0 p-2 text-gray-500 hover:text-gray-800">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                <div id="gameModalBody">
+                    </div>
+            </div>
         </div>
     </div>
 

@@ -1,14 +1,63 @@
 // --- 1. 模擬資料庫 (Mock Data) & 全域變數 ---
 
-// 預設資料 (如果完全沒存過檔才會用這些)
+// 預設資料 (包含詳細介紹)
 const defaultGames = [
-    { id: 1, name: "卡坦島 (Catan)", category: "策略", players: "3-4人", image: "images/catan.jpg" },
-    { id: 2, name: "璀璨寶石 (Splendor)", category: "輕策略", players: "2-4人", image: "images/splendor.jpg" },
-    { id: 3, name: "阿瓦隆 (Avalon)", category: "陣營", players: "5-10人", image: "images/avalon.jpg" },
-    { id: 4, name: "機密代號 (Codenames)", category: "派對", players: "4-8人", image: "images/codenames.jpg" },
-    { id: 5, name: "龍焰魔法鎮 (Flamecraft)", category: "策略", players: "1-5人", image: "images/flamecraft.jpg" },
-    { id: 6, name: "碰! (Bang!)", category: "陣營", players: "4-7人", image: "images/bang.jpg" },
-    { id: 7, name: "妙語說書人 (Dixit)", category: "派對", players: "3-6人", image: "images/dixit.jpg" }
+    { 
+        id: 1, 
+        name: "卡坦島 (Catan)", 
+        category: "策略", 
+        players: "3-4人", 
+        image: "images/catan.jpg", 
+        description: "玩家扮演拓荒者，在卡坦島上建立聚落、城鎮與道路。透過擲骰與交易資源來發展，爭取成為島上最強大的勢力。這是一款經典的德式桌遊，強調交易與談判技巧。" 
+    },
+    { 
+        id: 2, 
+        name: "璀璨寶石 (Splendor)", 
+        category: "輕策略", 
+        players: "2-4人", 
+        image: "images/splendor.jpg", 
+        description: "玩家扮演文藝復興時期的富商，透過收集寶石換取發展卡，吸引貴族來訪，獲得聲望，成為最受矚目的珠寶商。規則簡單好上手，但充滿策略深度。" 
+    },
+    { 
+        id: 3, 
+        name: "阿瓦隆 (Avalon)", 
+        category: "陣營", 
+        players: "5-10人", 
+        image: "images/avalon.jpg", 
+        description: "亞瑟王的忠臣與莫德雷德的爪牙之間的陣營對決。玩家需隱藏身分，透過邏輯推理與話術來完成任務或破壞行動。這是派對與聯誼必備的經典遊戲。" 
+    },
+    { 
+        id: 4, 
+        name: "機密代號 (Codenames)", 
+        category: "派對", 
+        players: "4-8人", 
+        image: "images/codenames.jpg", 
+        description: "兩隊間諜首領給出單字提示，隊員需猜出己方代號，同時避免猜到敵方代號或觸碰致命的殺手。考驗團隊默契與聯想力的文字遊戲。" 
+    },
+    { 
+        id: 5, 
+        name: "龍焰魔法鎮 (Flamecraft)", 
+        category: "策略", 
+        players: "1-5人", 
+        image: "images/flamecraft.jpg", 
+        description: "玩家扮演火焰龍守護者，在魔法鎮中協助工匠，收集資源與施展魔法，與可愛的龍寶寶們一起建設城鎮。美術風格極度可愛，療癒系策略遊戲。" 
+    },
+    { 
+        id: 6, 
+        name: "碰! (Bang!)", 
+        category: "陣營", 
+        players: "4-7人", 
+        image: "images/bang.jpg", 
+        description: "西部牛仔主題的陣營遊戲，警長、歹徒與叛徒之間的槍戰對決。利用手牌進行攻擊與防禦，判斷誰是敵是友，只有最後存活的人才能獲勝。" 
+    },
+    { 
+        id: 7, 
+        name: "妙語說書人 (Dixit)", 
+        category: "派對", 
+        players: "3-6人", 
+        image: "images/dixit.jpg", 
+        description: "用圖片說故事，考驗默契與想像力。敘述者需給出既不能太直白也不能太隱晦的提示，讓其他玩家猜測哪張是你的牌。卡牌畫風唯美，充滿藝術感。" 
+    }
 ];
 
 const defaultUsers = [
@@ -25,25 +74,45 @@ let reservations = [];
 let currentUser = null; 
 let currentPage = 'home';
 let categoryFilter = '全部';
-let currentCaptcha = ''; // 驗證碼變數
+let currentCaptcha = ''; 
 
 // --- 讀寫函數 (加強版) ---
+// --- 讀寫函數 (自動修復版) ---
 function loadAllData() {
-    // 載入桌遊
+    // 1. 載入桌遊 (新增自動補全介紹的邏輯)
     const storedGames = localStorage.getItem('games');
-    games = storedGames ? JSON.parse(storedGames) : [...defaultGames]; 
-    if (!storedGames) saveGames(); 
+    
+    if (storedGames) {
+        let parsedGames = JSON.parse(storedGames);
+        
+        // 遍歷存檔的遊戲，如果是預設遊戲 (ID 1~7) 且缺少 description，就從 defaultGames 補回來
+        games = parsedGames.map(game => {
+            const defaultGame = defaultGames.find(d => d.id === game.id);
+            if (defaultGame && !game.description) {
+                // 補上介紹
+                return { ...game, description: defaultGame.description };
+            }
+            return game;
+        });
+        
+        // 將修復後的資料存回硬碟，這樣下次就不用再修了
+        saveGames();
+    } else {
+        // 如果完全沒有存檔，直接使用新的預設資料
+        games = [...defaultGames];
+        saveGames(); 
+    }
 
-    // 載入使用者
+    // 2. 載入使用者
     const storedUsers = localStorage.getItem('users');
     users = storedUsers ? JSON.parse(storedUsers) : [...defaultUsers];
     if (!storedUsers) saveUsers();
 
-    // 載入預約
+    // 3. 載入預約
     const storedRes = localStorage.getItem('reservations');
     reservations = storedRes ? JSON.parse(storedRes) : [];
     
-    // 載入當前登入者
+    // 4. 載入當前登入者
     const storedCurr = localStorage.getItem('currentUser');
     if (storedCurr) {
         const parsedUser = JSON.parse(storedCurr);
@@ -353,8 +422,10 @@ function renderPage(page) {
             const filteredGames = categoryFilter === '全部'
                 ? games
                 : games.filter(g => g.category === categoryFilter);
+            
+            // 加入 onclick 觸發 openGameModal
             const gamesList = filteredGames.map(game => `
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition flex flex-col">
+                <div onclick="openGameModal(${game.id})" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition flex flex-col cursor-pointer transform hover:-translate-y-1">
                     <div class="h-48 bg-gray-200 relative">
                         <img src="${game.image}" alt="${game.name}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/400x300?text=Game'">
                         <span class="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">${game.category}</span>
@@ -365,7 +436,7 @@ function renderPage(page) {
                             <p class="text-gray-500 text-sm mb-2 flex items-center"><i data-lucide="users" class="w-3 h-3 mr-1"></i> ${game.players}</p>
                         </div>
                         <div class="flex justify-end items-center mt-4 pt-4 border-t">
-                            ${currentUser ? `<button onclick="navigateTo('reservation')" class="text-sm bg-indigo-50 text-indigo-600 px-3 py-1 rounded hover:bg-indigo-100">預約</button>` : ''}
+                            <span class="text-xs text-gray-400">點擊查看詳情</span>
                         </div>
                     </div>
                 </div>
@@ -414,9 +485,7 @@ function renderPage(page) {
             break;
 
         case 'register':
-            // 進入頁面時先產生一次
             currentCaptcha = Math.floor(1000 + Math.random() * 9000).toString();
-
             root.innerHTML = `
                 <div class="min-h-[80vh] flex items-center justify-center px-4">
                     <div class="bg-white p-8 rounded-xl shadow-xl w-full max-w-md">
@@ -443,17 +512,14 @@ function renderPage(page) {
                                 <label class="block text-sm font-medium text-gray-700 mb-1">驗證碼</label>
                                 <div class="flex gap-2 items-stretch h-11">
                                     <input type="text" name="captcha" class="flex-1 min-w-0 px-4 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none" placeholder="輸入數字" required maxlength="4">
-                                    
                                     <div id="captchaDisplay" class="w-20 bg-gray-200 text-gray-700 rounded-lg font-mono text-xl font-bold tracking-widest flex items-center justify-center select-none border border-gray-300 transition-colors duration-200">
                                         ${currentCaptcha}
                                     </div>
-                                    
                                     <button type="button" onclick="refreshCaptcha()" class="px-3 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 hover:text-indigo-600 transition border border-gray-300" title="更換驗證碼">
                                         <i data-lucide="refresh-cw" class="w-5 h-5"></i>
                                     </button>
                                 </div>
                             </div>
-
                             <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition mt-6">完成註冊</button>
                         </form>
                         <div class="mt-6 text-center border-t pt-6">
@@ -466,7 +532,6 @@ function renderPage(page) {
             break;
 
         case 'reservation':
-            // 產生今天與未來 30 日的日期限制
             const _today = new Date();
             function _fmt(d) {
                 const y = d.getFullYear();
@@ -522,6 +587,7 @@ function renderPage(page) {
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div><label class="text-xs text-gray-500">名稱</label><input id="newGameName" class="p-2 border rounded w-full"></div>
                             <div><label class="text-xs text-gray-500">類別</label><select id="newGameCat" class="p-2 border rounded w-full" required><option value="">請選擇</option>${categoryOptions}</select></div>
+                            <div class="md:col-span-2"><label class="text-xs text-gray-500">遊戲介紹</label><textarea id="newGameDesc" class="p-2 border rounded w-full h-20" placeholder="請輸入簡單的遊戲介紹..."></textarea></div>
                             <div><label class="text-xs text-gray-500">遊戲圖片 *</label><input id="newGameImage" type="file" accept="image/*" class="p-2 border rounded w-full" required></div>
                         </div>
                         <div id="imagePreview" class="w-32 h-40 bg-gray-200 rounded border-2 border-dashed flex items-center justify-center text-gray-400 text-sm">
@@ -538,7 +604,6 @@ function renderPage(page) {
                 </div>
             `;
             
-            // 為圖片輸入添加預覽功能
             setTimeout(() => {
                 const imageInput = document.getElementById('newGameImage');
                 if(imageInput) {
@@ -595,7 +660,6 @@ function renderPage(page) {
             break;
     }
     lucide.createIcons();
-    // 如果回到首頁，初始化或重新啟動輪播
     if (page === 'home') {
         setTimeout(() => {
             try {
@@ -619,12 +683,11 @@ function submitReservation(e) {
         status: "待確認",
         date: formData.get('date'),
         time: formData.get('time'),
-        // 儲存人數（若表單沒有 game 欄位，保留不指定）
         party_size: formData.get('party_size') ? parseInt(formData.get('party_size'), 10) : null,
         game: formData.get('game') || '不指定'
     };
     reservations.push(newRes);
-    saveReservations(); // 新增
+    saveReservations(); 
     alert("預約申請已送出！");
     navigateTo('home');
 }
@@ -632,6 +695,7 @@ function submitReservation(e) {
 function addGame() {
     const name = document.getElementById('newGameName').value;
     const category = document.getElementById('newGameCat').value;
+    const desc = document.getElementById('newGameDesc').value; // 獲取介紹
     const imageInput = document.getElementById('newGameImage');
     
     if(!name) return alert("請輸入名稱");
@@ -641,7 +705,6 @@ function addGame() {
     const reader = new FileReader();
     
     reader.onload = function(e) {
-        // 使用 Base64 編碼的圖片資料
         const imageData = e.target.result;
         
         games.push({
@@ -649,13 +712,14 @@ function addGame() {
             name, 
             category,
             players: "2-4人",
-            image: imageData  // 存儲 Base64 圖片數據
+            description: desc || "暫無介紹", // 儲存介紹
+            image: imageData 
         });
         saveGames();
         alert("新增成功！");
-        // 清空表單
         document.getElementById('newGameName').value = '';
         document.getElementById('newGameCat').value = '';
+        document.getElementById('newGameDesc').value = '';
         document.getElementById('newGameImage').value = '';
         document.getElementById('imagePreview').innerHTML = '預覽區域';
         renderPage('admin-games');
@@ -671,7 +735,7 @@ function addGame() {
 function deleteGame(id) {
     if(confirm("確定刪除？")) {
         games = games.filter(g => g.id !== id);
-        saveGames(); // 新增：儲存桌遊
+        saveGames(); 
         renderPage('admin-games');
     }
 }
@@ -679,7 +743,7 @@ function deleteGame(id) {
 function deleteReservation(id) {
     if(confirm("確定取消？")) {
         reservations = reservations.filter(r => r.id !== id);
-        saveReservations(); // 新增
+        saveReservations(); 
         renderPage('admin-reservations');
     }
 }
@@ -691,7 +755,6 @@ function kickMember(id) {
     if(confirm(`確定要踢除會員 ${member.name} 嗎？`)) {
         users = users.filter(u => u.id !== id);
         saveUsers();
-        // 如果被踢的人是當前登入的用戶，則登出
         if (currentUser && currentUser.id === id) {
             currentUser = null;
             saveCurrentUser();
@@ -740,7 +803,6 @@ function renderChatMessages() {
         el.textContent = m.text;
         body.appendChild(el);
     });
-    // 自動捲動到底部
     body.scrollTop = body.scrollHeight;
 }
 
@@ -754,14 +816,15 @@ function addMessage(from, text) {
 function toggleChat() {
     const panel = document.getElementById('chatbotPanel');
     if (!panel) return;
-    panel.classList.toggle('hidden');
-    const opened = !panel.classList.contains('hidden');
+    panel.classList.toggle('open');
+    
+    const opened = panel.classList.contains('open');
     panel.setAttribute('aria-hidden', (!opened).toString());
+    
     if (opened) {
         const input = document.getElementById('chatInput');
         if (input) input.focus();
     }
-    // 確保 lucide icon 更新
     setTimeout(() => { try { lucide.createIcons(); } catch(e) {} }, 0);
 }
 
@@ -776,7 +839,6 @@ function sendChatFromInput() {
 
 function sendUserMessage(text) {
     addMessage('user', text);
-    // 模擬延遲回覆
     setTimeout(() => botRespond(text), 700);
 }
 
@@ -792,7 +854,6 @@ function botRespond(userText) {
     addMessage('bot', reply);
 }
 
-// 鍵盤事件：Enter 送出
 document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('chatInput');
     if (input) {
@@ -805,82 +866,60 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ------------------ 輪播功能 ------------------
-// ------------------ 3D 輪播功能 (修改版) ------------------
+// ------------------ 3D 輪播功能 ------------------
 let carouselIndex = 0;
 let carouselTimer = null;
-let carouselItemsData = []; // 儲存當前輪播的資料
+let carouselItemsData = []; 
 
 function initCarousel() {
     const stage = document.querySelector('.carousel-stage');
     if (!stage) return;
 
-    // 使用前 7 張圖片 (奇數張效果較好)
     carouselItemsData = games.slice(0, 7); 
     if (carouselItemsData.length === 0) {
         stage.innerHTML = '<div style="color:#fff;">暫無圖片</div>';
         return;
     }
 
-    // 產生 HTML 結構
-    // 注意：我們給每個 item 加了 onclick 事件，傳入它自己的索引
     stage.innerHTML = carouselItemsData.map((g, i) => `
         <div class="carousel-item" onclick="clickSlide(${i})" style="background-image: url('${g.image.replace(/'/g, "\\'")}')">
             <div class="carousel-neon">${g.name}</div>
         </div>
     `).join('');
 
-    // 初始化位置
-    carouselIndex = Math.floor(carouselItemsData.length / 2); // 預設從中間開始
+    carouselIndex = Math.floor(carouselItemsData.length / 2); 
     update3DCarousel();
-
-    // 自動播放
     startCarousel();
     
-    // 滑鼠懸停暫停
     const wrap = document.querySelector('.carousel-wrap');
     wrap.addEventListener('mouseenter', stopCarousel);
     wrap.addEventListener('mouseleave', startCarousel);
 }
 
-// 核心：更新 3D 位置與樣式 (循環優化版)
 function update3DCarousel() {
     const items = document.querySelectorAll('.carousel-item');
-    // 注意：這裡要依賴上一步驟定義的 carouselItemsData
-    // 如果你沒有定義這個變數，請確保 initCarousel 裡有正確賦值，或是改用 games.length
     const total = carouselItemsData.length || document.querySelectorAll('.carousel-item').length;
     const halfTotal = Math.floor(total / 2);
 
     items.forEach((item, i) => {
-        // --- 1. 計算最短路徑 (讓最後一張的右邊變成第0張) ---
         let diff = i - carouselIndex;
-        
-        // 循環運算：如果距離太遠，就假設它在另一邊
         while (diff > halfTotal) diff -= total;
         while (diff < -halfTotal) diff += total;
         
         const offset = diff;
-        // ---------------------------------------------
 
-        // --- 2. 設定樣式 ---
         if (offset === 0) {
-            // --- 中間主角 ---
             item.style.transform = `translateX(0) scale(1) translateZ(200px) rotateY(0deg)`;
             item.style.zIndex = 100;
             item.style.opacity = 1;
             item.style.filter = 'brightness(1.2)';
             item.classList.add('active');
         } else {
-            // --- 左右配角 ---
             const limitOffset = Math.abs(offset); 
             const direction = offset > 0 ? 1 : -1;
-
-            // 參數調整區
-            const xBase = 55;   // 左右拉開的距離 (%)
-            const zBase = -100; // 深度 (px)
-            const rotateBase = -25; // 旋轉角度 (deg)
-
-            // 為了讓循環看起來自然，我們顯示範圍稍微寬一點，但太遠的還是隱藏
+            const xBase = 55;   
+            const zBase = -100; 
+            const rotateBase = -25; 
             const isFar = limitOffset > 3; 
 
             const tx = offset * xBase; 
@@ -895,7 +934,6 @@ function update3DCarousel() {
         }
     });
     
-    // 更新下方小圓點
     const dots = document.querySelectorAll('.carousel-dots button');
     if(dots.length) {
         dots.forEach(d => d.classList.remove('active'));
@@ -903,26 +941,20 @@ function update3DCarousel() {
     }
 }
 
-// 點擊圖片切換
 function clickSlide(index) {
-    // 如果點擊的不是當前這張，就切換過去
     if (index !== carouselIndex) {
         stopCarousel();
         carouselIndex = index;
         update3DCarousel();
-        // 點擊後重新開始計時，避免馬上又跳轉
-        // startCarousel() 會由 mouseleave 觸發，或是這裡可以不強制重啟
     }
 }
 
 function nextSlide() {
-    // 往右轉，index + 1，如果到底了就回到 0
     carouselIndex = (carouselIndex + 1) % carouselItemsData.length;
     update3DCarousel();
 }
 
 function prevSlide() {
-    // 往左轉，index - 1，如果 < 0 就回到最後一張
     carouselIndex = (carouselIndex - 1 + carouselItemsData.length) % carouselItemsData.length;
     update3DCarousel();
 }
@@ -939,7 +971,7 @@ function carouselPrev() {
 
 function startCarousel() {
     stopCarousel();
-    carouselTimer = setInterval(nextSlide, 3000); // 3秒換下一張
+    carouselTimer = setInterval(nextSlide, 3000); 
 }
 
 function stopCarousel() {
@@ -949,6 +981,45 @@ function stopCarousel() {
     }
 }
 
+// --- 新增：遊戲詳情 Modal 邏輯 ---
+function openGameModal(id) {
+    const game = games.find(g => g.id === id);
+    if(!game) return;
+    
+    const modal = document.getElementById('gameModalOverlay');
+    const body = document.getElementById('gameModalBody');
+    
+    // 填入內容 (移除按鈕)
+    body.innerHTML = `
+        <div class="relative">
+            <img src="${game.image}" class="w-full h-64 object-cover rounded-t-lg" onerror="this.src='https://via.placeholder.com/600x400?text=Game'">
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 text-white">
+                <h3 class="text-3xl font-bold">${game.name}</h3>
+                <span class="text-sm bg-indigo-600 px-2 py-1 rounded ml-2">${game.category}</span>
+            </div>
+        </div>
+        <div class="p-6">
+            <div class="flex items-center text-gray-500 mb-4">
+                <i data-lucide="users" class="w-5 h-5 mr-2"></i>
+                <span class="font-medium">建議人數：${game.players}</span>
+            </div>
+            <div class="prose max-w-none text-gray-700 leading-relaxed">
+                <h4 class="font-bold text-lg mb-2 text-indigo-900">遊戲介紹</h4>
+                <p>${game.description || "暫無詳細介紹。"}</p>
+            </div>
+        </div>
+    `;
+    
+    modal.classList.add('open');
+    lucide.createIcons();
+}
+
+function closeGameModal(e) {
+    // 如果是點擊背景遮罩(overlay)或是明確呼叫，則關閉
+    if (!e || e.target.id === 'gameModalOverlay' || !e.target) {
+        document.getElementById('gameModalOverlay').classList.remove('open');
+    }
+}
 
 // 啟動
 init();
