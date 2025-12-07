@@ -89,6 +89,14 @@ const defaultGames = [
         players: "3-6人",
         image: "images/skull_roses.jpg",
         description: "一款心理戰與猜測的派對遊戲，玩家輪流放置骷髏或玫瑰卡片，並嘗試猜測對手的卡片組合。適合喜歡刺激與策略的玩家。"
+    },
+    {
+        id: 12,
+        name: "馬尼拉(Manila)",
+        category: "輕策略",
+        players: "3-5人",
+        image: "images/manila.jpg",
+        description: "一款以18世紀菲律賓為背景的交易與冒險遊戲，玩家扮演商人，透過競標、航行與交易來賺取財富。規則簡單但充滿策略性，適合家庭與朋友聚會。"
     }
 ];
 
