@@ -57,6 +57,38 @@ const defaultGames = [
         players: "3-6人", 
         image: "images/dixit.jpg", 
         description: "用圖片說故事，考驗默契與想像力。敘述者需給出既不能太直白也不能太隱晦的提示，讓其他玩家猜測哪張是你的牌。卡牌畫風唯美，充滿藝術感。" 
+    },
+    {
+        id: 8,
+        name: "瘋狂實驗室 (Dr. Eureka)",
+        category: "輕策略",
+        players: "2-4人",
+        image: "images/dr_eureka.jpg",
+        description: "玩家扮演瘋狂科學家，透過移動試管中的彩色球體來完成實驗任務。這是一款考驗手眼協調與快速反應的遊戲，適合全家大小一起玩。"
+    },
+    {
+        id: 9,
+        name: "文明繪卷 (Tapestry)",
+        category: "策略",
+        players: "1-5人",
+        image: "images/tapestry.jpg",
+        description: "文明發展主題的策略遊戲，玩家從史前時代一路發展到未來科技。透過探索、科技、文化與軍事等多種路徑來建立獨特的文明，爭取最高分數。"
+    },
+    {
+        id: 10,
+        name: "狼人殺 (Werewolf)",
+        category: "陣營",
+        players: "7-6~18人 + 1名主持者",
+        image: "images/werewolf.jpg",
+        description: "經典的社交推理遊戲，村民與狼人之間的心理戰。玩家需透過討論與投票找出潛伏的狼人，同時狼人則試圖混淆視聽，消滅村民。適合大型聚會與派對。"
+    },
+    {
+        id: 11,
+        name: "骷髏與玫瑰(Skull & Roses)",
+        category: "派對",
+        players: "3-6人",
+        image: "images/skull_roses.jpg",
+        description: "一款心理戰與猜測的派對遊戲，玩家輪流放置骷髏或玫瑰卡片，並嘗試猜測對手的卡片組合。適合喜歡刺激與策略的玩家。"
     }
 ];
 
