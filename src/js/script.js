@@ -1,112 +1,25 @@
 // --- 1. 模擬資料庫 (Mock Data) & 全域變數 ---
 
-// 預設資料
 const defaultGames = [
-    { 
-        id: 1, 
-        name: "卡坦島 (Catan)", 
-        category: "策略", 
-        players: "3-4人", 
-        image: "images/catan.jpg", 
-        description: "玩家扮演拓荒者，在卡坦島上建立聚落、城鎮與道路。透過擲骰與交易資源來發展，爭取成為島上最強大的勢力。這是一款經典的德式桌遊，強調交易與談判技巧。" 
-    },
-    { 
-        id: 2, 
-        name: "璀璨寶石 (Splendor)", 
-        category: "輕策略", 
-        players: "2-4人", 
-        image: "images/splendor.jpg", 
-        description: "玩家扮演文藝復興時期的富商，透過收集寶石換取發展卡，吸引貴族來訪，獲得聲望，成為最受矚目的珠寶商。規則簡單好上手，但充滿策略深度。" 
-    },
-    { 
-        id: 3, 
-        name: "阿瓦隆 (Avalon)", 
-        category: "陣營", 
-        players: "5-10人", 
-        image: "images/avalon.jpg", 
-        description: "亞瑟王的忠臣與莫德雷德的爪牙之間的陣營對決。玩家需隱藏身分，透過邏輯推理與話術來完成任務或破壞行動。這是派對與聯誼必備的經典遊戲。" 
-    },
-    { 
-        id: 4, 
-        name: "機密代號 (Codenames)", 
-        category: "派對", 
-        players: "4-8人", 
-        image: "images/codenames.jpg", 
-        description: "兩隊間諜首領給出單字提示，隊員需猜出己方代號，同時避免猜到敵方代號或觸碰致命的殺手。考驗團隊默契與聯想力的文字遊戲。" 
-    },
-    { 
-        id: 5, 
-        name: "龍焰魔法鎮 (Flamecraft)", 
-        category: "策略", 
-        players: "1-5人", 
-        image: "images/flamecraft.jpg", 
-        description: "玩家扮演火焰龍守護者，在魔法鎮中協助工匠，收集資源與施展魔法，與可愛的龍寶寶們一起建設城鎮。美術風格極度可愛，療癒系策略遊戲。" 
-    },
-    { 
-        id: 6, 
-        name: "碰! (Bang!)", 
-        category: "陣營", 
-        players: "4-7人", 
-        image: "images/bang.jpg", 
-        description: "西部牛仔主題的陣營遊戲，警長、歹徒與叛徒之間的槍戰對決。利用手牌進行攻擊與防禦，判斷誰是敵是友，只有最後存活的人才能獲勝。" 
-    },
-    { 
-        id: 7, 
-        name: "妙語說書人 (Dixit)", 
-        category: "派對", 
-        players: "3-6人", 
-        image: "images/dixit.jpg", 
-        description: "用圖片說故事，考驗默契與想像力。敘述者需給出既不能太直白也不能太隱晦的提示，讓其他玩家猜測哪張是你的牌。卡牌畫風唯美，充滿藝術感。" 
-    },
-    {
-        id: 8,
-        name: "瘋狂實驗室 (Dr. Eureka)",
-        category: "輕策略",
-        players: "2-4人",
-        image: "images/dr_eureka.jpg",
-        description: "玩家扮演瘋狂科學家，透過移動試管中的彩色球體來完成實驗任務。這是一款考驗手眼協調與快速反应的遊戲，適合全家大小一起玩。"
-    },
-    {
-        id: 9,
-        name: "文明繪卷 (Tapestry)",
-        category: "策略",
-        players: "1-5人",
-        image: "images/tapestry.jpg",
-        description: "文明發展主題的策略遊戲，玩家從史前時代一路發展到未來科技。透過探索、科技、文化與軍事等多種路徑來建立獨特的文明，爭取最高分數。"
-    },
-    {
-        id: 10,
-        name: "狼人殺 (Werewolf)",
-        category: "陣營",
-        players: "7-6~18人 + 1名主持者",
-        image: "images/werewolf.jpg",
-        description: "經典的社交推理遊戲，村民與狼人之間的心理戰。玩家需透過討論與投票找出潛伏的狼人，同時狼人則試圖混淆視聽，消滅村民。適合大型聚會與派對。"
-    },
-    {
-        id: 11,
-        name: "骷髏與玫瑰(Skull & Roses)",
-        category: "派對",
-        players: "3-6人",
-        image: "images/skull_roses.jpg",
-        description: "一款心理戰與猜測的派對遊戲，玩家輪流放置骷髏或玫瑰卡片，並嘗試猜測對手的卡片組合。適合喜歡刺激與策略的玩家。"
-    },
-    {
-        id: 12,
-        name: "馬尼拉(Manila)",
-        category: "輕策略",
-        players: "3-5人",
-        image: "images/manila.jpg",
-        description: "一款以18世紀菲律賓為背景的交易與冒險遊戲，玩家扮演商人，透過競標、航行與交易來賺取財富。規則簡單但充滿策略性，適合家庭與朋友聚會。"
-    }
+    { id: 1, name: "卡坦島 (Catan)", category: "策略", players: "3-4人", image: "images/catan.jpg", description: "玩家扮演拓荒者，在卡坦島上建立聚落、城鎮與道路。透過擲骰與交易資源來發展，爭取成為島上最強大的勢力。這是一款經典的德式桌遊，強調交易與談判技巧。" },
+    { id: 2, name: "璀璨寶石 (Splendor)", category: "輕策略", players: "2-4人", image: "images/splendor.jpg", description: "玩家扮演文藝復興時期的富商，透過收集寶石換取發展卡，吸引貴族來訪，獲得聲望，成為最受矚目的珠寶商。規則簡單好上手，但充滿策略深度。" },
+    { id: 3, name: "阿瓦隆 (Avalon)", category: "陣營", players: "5-10人", image: "images/avalon.jpg", description: "亞瑟王的忠臣與莫德雷德的爪牙之間的陣營對決。玩家需隱藏身分，透過邏輯推理與話術來完成任務或破壞行動。這是派對與聯誼必備的經典遊戲。" },
+    { id: 4, name: "機密代號 (Codenames)", category: "派對", players: "4-8人", image: "images/codenames.jpg", description: "兩隊間諜首領給出單字提示，隊員需猜出己方代號，同時避免猜到敵方代號或觸碰致命的殺手。考驗團隊默契與聯想力的文字遊戲。" },
+    { id: 5, name: "龍焰魔法鎮 (Flamecraft)", category: "策略", players: "1-5人", image: "images/flamecraft.jpg", description: "玩家扮演火焰龍守護者，在魔法鎮中協助工匠，收集資源與施展魔法，與可愛的龍寶寶們一起建設城鎮。美術風格極度可愛，療癒系策略遊戲。" },
+    { id: 6, name: "碰! (Bang!)", category: "陣營", players: "4-7人", image: "images/bang.jpg", description: "西部牛仔主題的陣營遊戲，警長、歹徒與叛徒之間的槍戰對決。利用手牌進行攻擊與防禦，判斷誰是敵是友，只有最後存活的人才能獲勝。" },
+    { id: 7, name: "妙語說書人 (Dixit)", category: "派對", players: "3-6人", image: "images/dixit.jpg", description: "用圖片說故事，考驗默契與想像力。敘述者需給出既不能太直白也不能太隱晦的提示，讓其他玩家猜測哪張是你的牌。卡牌畫風唯美，充滿藝術感。" },
+    { id: 8, name: "瘋狂實驗室 (Dr. Eureka)", category: "輕策略", players: "2-4人", image: "images/dr_eureka.jpg", description: "玩家扮演瘋狂科學家，透過移動試管中的彩色球體來完成實驗任務。這是一款考驗手眼協調與快速反應的遊戲，適合全家大小一起玩。" },
+    { id: 9, name: "文明繪卷 (Tapestry)", category: "策略", players: "1-5人", image: "images/tapestry.jpg", description: "文明發展主題的策略遊戲，玩家從史前時代一路發展到未來科技。透過探索、科技、文化與軍事等多種路徑來建立獨特的文明，爭取最高分數。" },
+    { id: 10, name: "狼人殺 (Werewolf)", category: "陣營", players: "7-6~18人 + 1名主持者", image: "images/werewolf.jpg", description: "經典的社交推理遊戲，村民與狼人之間的心理戰。玩家需透過討論與投票找出潛伏的狼人，同時狼人則試圖混淆視聽，消滅村民。適合大型聚會與派對。" },
+    { id: 11, name: "骷髏與玫瑰(Skull & Roses)", category: "派對", players: "3-6人", image: "images/skull_roses.jpg", description: "一款心理戰與猜測的派對遊戲，玩家輪流放置骷髏或玫瑰卡片，並嘗試猜測對手的卡片組合。適合喜歡刺激與策略的玩家。" },
+    { id: 12, name: "馬尼拉(Manila)", category: "輕策略", players: "3-5人", image: "images/manila.jpg", description: "一款以18世紀菲律賓為背景的交易與冒險遊戲，玩家扮演商人，透過競標、航行與交易來賺取財富。規則簡單但充滿策略性，適合家庭與朋友聚會。" }
 ];
 
-// 加入經驗值、稱號與偏好設定的會員資料
 const defaultUsers = [
     { id: 1, username: "user", name: "王小明", role: "member", password: "user", xp: 3450, level: 8, title: "白銀策略家", preferences: ["策略", "輕策略"] },
     { id: 99, username: "admin", name: "店長大大", role: "admin", password: "admin", xp: 99999, level: 99, title: "桌遊之神", preferences: [] }
 ];
 
-// 庫存損耗系統假資料
 const defaultInventory = [
     { id: 'INV-001', gameName: "卡坦島 (Catan)", boxNo: "01", health: 100, status: "良好", missingParts: "無" },
     { id: 'INV-002', gameName: "卡坦島 (Catan)", boxNo: "02", health: 65, status: "缺件警告", missingParts: "少一個紅色木頭村莊" },
@@ -114,20 +27,33 @@ const defaultInventory = [
     { id: 'INV-004', gameName: "璀璨寶石 (Splendor)", boxNo: "01", health: 30, status: "嚴重損耗", missingParts: "少一枚綠寶石盲籌，牌面模糊" },
 ];
 
-// LFG 揪團與桌況假資料
 let lfgPosts = [
     { id: 101, host: "彬皓", game: "阿瓦隆 (Avalon)", maxPlayers: 8, currentPlayers: ["彬皓", "皓文", "寶龍"], time: "14:00", status: "缺人中" },
     { id: 102, host: "店長大大", game: "璀璨寶石 (Splendor)", maxPlayers: 4, currentPlayers: ["店長大大"], time: "16:00", status: "缺人中" },
     { id: 103, host: "王小明", game: "機密代號 (Codenames)", maxPlayers: 6, currentPlayers: ["王小明", "小美", "阿強", "老李", "大明", "阿花"], time: "19:00", status: "已滿團" }
 ];
 
-// 真正的全域變數
+// 🌟 全域翻譯字典：讓系統知道資料庫的中文字對應什麼英文
+const i18n = {
+    '策略': 'Strategy',
+    '輕策略': 'Light Strategy',
+    '陣營': 'Faction',
+    '派對': 'Party',
+    '全部': 'All',
+    '良好': 'Good',
+    '輕微磨損': 'Slight Wear',
+    '缺件警告': 'Missing Parts',
+    '嚴重損耗': 'Severe Damage',
+    '桌遊新手': 'Board Game Rookie',
+    '白銀策略家': 'Silver Strategist',
+    '桌遊之神': 'God of Board Games'
+};
+
 let games = [];
 let users = [];
 let reservations = [];
 let inventory = [];
 
-// 全域狀態 (已修正重複宣告問題)
 let activeTab = 'tables'; 
 let currentUser = null; 
 let currentPage = 'home';
@@ -136,23 +62,17 @@ let currentCaptcha = '';
 let searchQuery = ''; 
 let currentLang = 'zh'; 
 
-// --- 讀寫函數 ---
 function loadAllData() {
     const storedGames = localStorage.getItem('games');
     if (storedGames) {
         let parsedGames = JSON.parse(storedGames);
         games = parsedGames.map(game => {
             const defaultGame = defaultGames.find(d => d.id === game.id);
-            if (defaultGame && !game.description) {
-                return { ...game, description: defaultGame.description };
-            }
+            if (defaultGame && !game.description) { return { ...game, description: defaultGame.description }; }
             return game;
         });
         saveGames();
-    } else {
-        games = [...defaultGames];
-        saveGames(); 
-    }
+    } else { games = [...defaultGames]; saveGames(); }
 
     const storedUsers = localStorage.getItem('users');
     users = storedUsers ? JSON.parse(storedUsers) : [...defaultUsers];
@@ -184,125 +104,84 @@ function saveCurrentUser() {
 // --- 核心功能函數 ---
 
 function init() {
-    loadAllData();
+    // 🌟 加入「資料版本控制」：
+    // 只要這裡的版號跟隊友電腦裡的不一樣，系統就會強制洗掉他們舊的錯誤資料，載入正確的 defaultInventory！
+    const APP_VERSION = "1.1"; 
+    if (localStorage.getItem('appVersion') !== APP_VERSION) {
+        localStorage.clear();
+        localStorage.setItem('appVersion', APP_VERSION);
+    }
+
+    loadAllData(); // 讀取資料
     try { localStorage.removeItem('chatMessages'); } catch(e) {}
     chatMessages = [];
+    
+    // 初始化機器人訊息
     addMessage('bot', currentLang === 'zh' ? '哈囉！我是小圈機器人，歡迎來到圈圈桌遊店。' : 'Hello! I am Circle Bot, welcome to Circle Board Games.');
     addMessage('bot', currentLang === 'zh' ? '提示：你可以輸入「你好」、「營業時間」、「價格」、「預約」、「桌遊」得到快速回覆。' : 'Hint: Type "hello", "hours", "price", "booking", or "games" for quick replies.');
     
     renderNavbar();
     renderPage('home');
     lucide.createIcons();
-    
-    setTimeout(() => {
-        try { initCarousel(); } catch(e) { console.error(e); }
-    }, 100);
+    setTimeout(() => { try { initCarousel(); } catch(e) { console.error(e); } }, 100);
 }
 
-// 登入
 function login(event) {
     event.preventDefault();
     const form = event.target;
-    const username = form.username.value;
-    const password = form.password.value;
-    
     loadAllData();
-    const user = users.find(u => u.username === username && u.password === password);
-    
+    const user = users.find(u => u.username === form.username.value && u.password === form.password.value);
     if (user) {
-        currentUser = user;
-        saveCurrentUser();
+        currentUser = user; saveCurrentUser();
         const roleName = user.role === 'admin' ? (currentLang === 'zh' ? '管理員' : 'Admin') : (currentLang === 'zh' ? '會員' : 'Member');
         alert(currentLang === 'zh' ? `歡迎回來，${user.name}！身分：${roleName}` : `Welcome back, ${user.name}! Role: ${roleName}`);
-        renderNavbar();
-        renderPage('home');
+        renderNavbar(); renderPage('home');
     } else {
         alert(currentLang === 'zh' ? "帳號或密碼錯誤 (測試帳號: admin/admin 或 user/user)" : "Invalid username or password");
     }
 }
 
-// 註冊
 function register(event) {
     event.preventDefault();
     const form = event.target;
-    const name = form.name.value;
-    const username = form.username.value;
-    const password = form.password.value;
-    const confirmPassword = form.confirmPassword.value;
-    const captchaInput = form.captcha.value;
-    
-    if (captchaInput !== currentCaptcha) {
+    if (form.captcha.value !== currentCaptcha) {
         alert(currentLang === 'zh' ? "驗證碼錯誤，請重新輸入！" : "Incorrect captcha, please try again!");
-        form.captcha.value = ''; 
-        refreshCaptcha();        
-        form.captcha.focus();    
-        return;
+        form.captcha.value = ''; refreshCaptcha(); form.captcha.focus(); return;
     }
-
-    if (password !== confirmPassword) {
-        alert(currentLang === 'zh' ? "密碼和確認密碼不一致" : "Passwords do not match");
-        return;
+    if (form.password.value !== form.confirmPassword.value) {
+        alert(currentLang === 'zh' ? "密碼和確認密碼不一致" : "Passwords do not match"); return;
     }
-    
-    if (users.find(u => u.username === username)) {
-        alert(currentLang === 'zh' ? "此帳號已被使用，請選擇其他帳號" : "Username already taken");
-        return;
+    if (users.find(u => u.username === form.username.value)) {
+        alert(currentLang === 'zh' ? "此帳號已被使用，請選擇其他帳號" : "Username already taken"); return;
     }
     
     const newUser = {
-        id: Date.now(),
-        username,
-        name,
-        role: "member",
-        password,
-        xp: 0,
-        level: 1,
-        title: currentLang === 'zh' ? "桌遊新手" : "Board Game Rookie",
-        preferences: ["派對"]
+        id: Date.now(), username: form.username.value, name: form.name.value, role: "member", password: form.password.value, xp: 0, level: 1, title: "桌遊新手", preferences: ["派對"]
     };
-    
-    users.push(newUser);
-    saveUsers();
-    
-    alert(currentLang === 'zh' ? `註冊成功！歡迎 ${name}！` : `Registration successful! Welcome ${name}!`);
-    currentUser = newUser;
-    saveCurrentUser();
-    renderNavbar();
-    renderPage('home');
+    users.push(newUser); saveUsers();
+    alert(currentLang === 'zh' ? `註冊成功！歡迎 ${form.name.value}！` : `Registration successful! Welcome ${form.name.value}!`);
+    currentUser = newUser; saveCurrentUser(); renderNavbar(); renderPage('home');
 }
 
 function refreshCaptcha() {
     currentCaptcha = Math.floor(1000 + Math.random() * 9000).toString();
     const display = document.getElementById('captchaDisplay');
-    if (display) {
-        display.textContent = currentCaptcha;
-        display.classList.add('bg-gray-300');
-        setTimeout(() => display.classList.remove('bg-gray-300'), 200);
-    }
+    if (display) { display.textContent = currentCaptcha; display.classList.add('bg-gray-300'); setTimeout(() => display.classList.remove('bg-gray-300'), 200); }
 }
 
-function logout() {
-    currentUser = null;
-    saveCurrentUser();
-    renderNavbar();
-    renderPage('home');
-}
+function logout() { currentUser = null; saveCurrentUser(); renderNavbar(); renderPage('home'); }
 
 function navigateTo(page) {
     if (!currentUser && (page === 'reservation' || page === 'profile')) {
         alert(currentLang === 'zh' ? "請先登入會員才能使用此功能！" : "Please login to access this feature!");
-        renderPage('login');
-        return;
+        renderPage('login'); return;
     }
     renderPage(page);
     const mobileMenu = document.getElementById('mobile-menu');
     if(mobileMenu) mobileMenu.classList.add('hidden');
 }
 
-function toggleMobileMenu() {
-    const menu = document.getElementById('mobile-menu');
-    menu.classList.toggle('hidden');
-}
+function toggleMobileMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
 
 function renderNavbar() {
     const desktopMenu = document.getElementById('desktop-menu');
@@ -330,27 +209,16 @@ function renderNavbar() {
 
     let rightSide = '';
     if (currentUser) {
-        // 🌟 新增：針對資料庫的靜態稱號進行動態翻譯
+        // 🌟 這裡會自動從字典抓稱號翻譯！
         let displayTitle = currentUser.title || '';
-        if (currentLang === 'en') {
-            if (displayTitle === '桌遊新手') displayTitle = 'Board Game Rookie';
-            else if (displayTitle === '白銀策略家') displayTitle = 'Silver Strategist';
-            else if (displayTitle === '桌遊之神') displayTitle = 'God of Board Games';
-        } else {
-            if (displayTitle === 'Board Game Rookie') displayTitle = '桌遊新手';
-            else if (displayTitle === 'Silver Strategist') displayTitle = '白銀策略家';
-            else if (displayTitle === 'God of Board Games') displayTitle = '桌遊之神';
-        }
-
+        displayTitle = currentLang === 'zh' ? displayTitle : (i18n[displayTitle] || displayTitle);
         const roleLabel = role === 'admin' ? (currentLang === 'zh' ? '管理員' : 'Admin') : 'LV.' + (currentUser.level || 1) + ' ' + (displayTitle || (currentLang === 'zh' ? '會員' : 'Member'));
         
         rightSide = `
             <div class="border-l pl-4 ml-4 flex items-center space-x-3">
                 <div class="flex flex-col items-end cursor-pointer hover:opacity-80 transition" onclick="navigateTo('profile')" title="進入會員中心">
                     <span class="text-sm font-bold text-yellow-300 border-b border-transparent hover:border-yellow-300">${currentUser.name}</span>
-                    <span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
-                        ${roleLabel}
-                    </span>
+                    <span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">${roleLabel}</span>
                 </div>
                 <button onclick="logout()" class="text-gray-300 hover:text-red-400 p-2" title="登出">
                     <i data-lucide="log-out" class="w-5 h-5"></i>
@@ -369,7 +237,6 @@ function renderNavbar() {
     }
 
     if (desktopMenu) desktopMenu.innerHTML = menuItems + rightSide;
-    
     if (mobileMenu) {
         mobileMenu.innerHTML = menuItems + (currentUser ? 
             `<div class="border-t pt-2 mt-2">
@@ -381,9 +248,10 @@ function renderNavbar() {
             </div>`
         );
     }
-    
     lucide.createIcons();
 }
+
+// --- 2. 畫面渲染核心 (前台頁面) ---
 
 function renderPage(page) {
     currentPage = page;
@@ -458,7 +326,7 @@ function renderPage(page) {
                     ${categories.map(c => `
                         <button onclick="setCategoryFilter('${c}')"
                             class="px-3 py-1 rounded-full text-sm transition ${categoryFilter === c ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}">
-                            ${c === '全部' ? (currentLang === 'zh' ? '全部' : 'All') : c}
+                            ${currentLang === 'zh' ? c : (i18n[c] || c)}
                         </button>
                     `).join('')}
                 </div>
@@ -470,23 +338,28 @@ function renderPage(page) {
                 return matchCat && matchSearch;
             });
             
-            const gamesList = filteredGames.map(game => `
-                <div onclick="openGameModal(${game.id})" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition flex flex-col cursor-pointer transform hover:-translate-y-1">
-                    <div class="h-48 bg-gray-200 relative">
-                        <img src="${game.image}" alt="${game.name}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/400x300?text=Game'">
-                        <span class="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">${game.category}</span>
-                    </div>
-                    <div class="p-4 flex-1 flex flex-col justify-between">
-                        <div>
-                            <h3 class="font-bold text-lg mb-1">${game.name}</h3>
-                            <p class="text-gray-500 text-sm mb-2 flex items-center"><i data-lucide="users" class="w-3 h-3 mr-1"></i> ${game.players}</p>
+            const gamesList = filteredGames.map(game => {
+                // 🌟 這裡會自動翻譯每一張卡片右上角的分類、跟左下角的「人」
+                const displayCat = currentLang === 'zh' ? game.category : (i18n[game.category] || game.category);
+                const displayPlayers = currentLang === 'zh' ? game.players : game.players.replace('人', ' Players');
+                return `
+                    <div onclick="openGameModal(${game.id})" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition flex flex-col cursor-pointer transform hover:-translate-y-1">
+                        <div class="h-48 bg-gray-200 relative">
+                            <img src="${game.image}" alt="${game.name}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/400x300?text=Game'">
+                            <span class="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">${displayCat}</span>
                         </div>
-                        <div class="flex justify-end items-center mt-4 pt-4 border-t">
-                            <span class="text-xs text-gray-400">${currentLang === 'zh' ? '點擊查看詳情' : 'Click for details'}</span>
+                        <div class="p-4 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-lg mb-1">${game.name}</h3>
+                                <p class="text-gray-500 text-sm mb-2 flex items-center"><i data-lucide="users" class="w-3 h-3 mr-1"></i> ${displayPlayers}</p>
+                            </div>
+                            <div class="flex justify-end items-center mt-4 pt-4 border-t">
+                                <span class="text-xs text-gray-400">${currentLang === 'zh' ? '點擊查看詳情' : 'Click for details'}</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
             
             root.innerHTML = `
                 <div class="max-w-7xl mx-auto px-4 py-8">
@@ -509,11 +382,8 @@ function renderPage(page) {
                                 </button>
                             </div>
                         </div>
-
                         <div class="border-t border-gray-200 my-4"></div>
-                        <div>
-                            ${catNav}
-                        </div>
+                        <div>${catNav}</div>
                     </div>
 
                     ${filteredGames.length
@@ -532,7 +402,6 @@ function renderPage(page) {
             const today = new Date();
             const minDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
             
-            // 修正：調整底線顏色 (border-gray-600) 與按鈕高亮顏色適應深色背景
             const tabUI = `
                 <div class="flex justify-center mb-6 border-b border-gray-600">
                     <button onclick="switchResTab('tables')" class="px-6 py-3 font-bold text-lg transition-colors ${activeTab === 'tables' ? 'text-indigo-400 border-b-4 border-indigo-400' : 'text-gray-400 hover:text-indigo-300'}">${currentLang === 'zh' ? '實時桌況預約' : 'Live Table Booking'}</button>
@@ -668,21 +537,28 @@ function renderPage(page) {
             }
             break;
 
+// --- 3. 畫面渲染核心 (後台與會員頁面) ---
         case 'profile':
             if (!currentUser) return;
             const xpPercentage = ((currentUser.xp || 0) % 1000) / 1000 * 100;
             const userPrefs = currentUser.preferences || [];
             const recommendedGames = games.filter(g => userPrefs.includes(g.category)).slice(0, 3);
             
-            const recHtml = recommendedGames.map(g => `
+            const recHtml = recommendedGames.map(g => {
+                const displayCat = currentLang === 'zh' ? g.category : (i18n[g.category] || g.category);
+                return `
                 <div onclick="openGameModal(${g.id})" class="flex items-center gap-4 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-indigo-50 border border-transparent hover:border-indigo-200 transition">
                     <img src="${g.image}" class="w-16 h-16 rounded object-cover">
                     <div>
                         <h4 class="font-bold text-gray-800">${g.name}</h4>
-                        <span class="text-xs text-indigo-600 bg-indigo-100 px-2 py-1 rounded">${g.category}</span>
+                        <span class="text-xs text-indigo-600 bg-indigo-100 px-2 py-1 rounded">${displayCat}</span>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
+
+            const translatedPrefs = userPrefs.map(p => currentLang === 'zh' ? p : (i18n[p] || p));
+            let displayTitle = currentUser.title || '';
+            displayTitle = currentLang === 'zh' ? displayTitle : (i18n[displayTitle] || displayTitle);
 
             root.innerHTML = `
                 <div class="max-w-4xl mx-auto px-4 py-8 animate-fade-in">
@@ -692,8 +568,8 @@ function renderPage(page) {
                                 ${currentUser.name[0]}
                             </div>
                             <div class="flex-1">
-                                <h2 class="text-3xl font-bold mb-1">${currentUser.name} <span class="text-lg font-normal text-indigo-200 bg-black/20 px-3 py-1 rounded-full ml-2">${currentUser.title || (currentLang === 'zh' ? '會員' : 'Member')}</span></h2>
-                                <p class="text-indigo-100 mb-4">@${currentUser.username} • ${currentLang === 'zh' ? '擅長：' : 'Prefers: '}${userPrefs.join(', ') || (currentLang === 'zh' ? '無' : 'None')}</p>
+                                <h2 class="text-3xl font-bold mb-1">${currentUser.name} <span class="text-lg font-normal text-indigo-200 bg-black/20 px-3 py-1 rounded-full ml-2">${displayTitle || (currentLang === 'zh' ? '會員' : 'Member')}</span></h2>
+                                <p class="text-indigo-100 mb-4">@${currentUser.username} • ${currentLang === 'zh' ? '擅長：' : 'Prefers: '}${translatedPrefs.join(', ') || (currentLang === 'zh' ? '無' : 'None')}</p>
                                 
                                 <div class="flex items-center gap-3">
                                     <span class="font-bold font-mono text-xl">LV.${currentUser.level || 1}</span>
@@ -742,6 +618,9 @@ function renderPage(page) {
                 const healthColor = item.health > 80 ? 'bg-green-500' : (item.health > 50 ? 'bg-yellow-500' : 'bg-red-500');
                 const statusColor = item.health > 80 ? 'text-green-600 bg-green-50' : (item.health > 50 ? 'text-yellow-600 bg-yellow-50' : 'text-red-600 bg-red-50');
                 
+                // 🌟 這裡會自動從字典抓取狀態的英文翻譯
+                const displayStatus = currentLang === 'zh' ? item.status : (i18n[item.status] || item.status);
+                
                 return `
                 <tr class="hover:bg-gray-50 transition">
                     <td class="px-6 py-4 font-mono text-sm text-gray-500">${item.id}</td>
@@ -754,7 +633,7 @@ function renderPage(page) {
                             <span class="text-xs text-gray-500 w-8">${item.health}%</span>
                         </div>
                     </td>
-                    <td class="px-6 py-4"><span class="px-2 py-1 rounded text-xs font-bold ${statusColor}">${item.status}</span></td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 rounded text-xs font-bold ${statusColor}">${displayStatus}</span></td>
                     <td class="px-6 py-4 text-sm text-gray-500">${item.missingParts}</td>
                     <td class="px-6 py-4 text-right">
                         <button onclick="openEditInventory('${item.id}')" class="text-indigo-600 hover:text-indigo-900 text-sm font-bold bg-indigo-50 px-3 py-1 rounded">${currentLang === 'zh' ? '編輯狀態' : 'Edit'}</button>
@@ -905,7 +784,7 @@ function renderPage(page) {
             const adminGamesList = games.map(game => `
                 <tr class="hover:bg-gray-50 transition">
                     <td class="px-6 py-4 font-medium">${game.name}</td>
-                    <td class="px-6 py-4 text-gray-500">${game.category}</td>
+                    <td class="px-6 py-4 text-gray-500">${currentLang === 'zh' ? game.category : (i18n[game.category] || game.category)}</td>
                     <td class="px-6 py-4 text-right">
                         <button onclick="deleteGame(${game.id})" class="text-red-600 hover:text-red-900 font-bold bg-red-50 px-3 py-1 rounded">${currentLang === 'zh' ? '刪除' : 'Delete'}</button>
                     </td>
@@ -913,7 +792,7 @@ function renderPage(page) {
             `).join('');
             
             const allCategories = ['全部', ...new Set(games.map(g => g.category))];
-            const categoryOptions = allCategories.filter(c => c !== '全部').map(cat => `<option value="${cat}">${cat}</option>`).join('');
+            const categoryOptions = allCategories.filter(c => c !== '全部').map(cat => `<option value="${cat}">${currentLang === 'zh' ? cat : (i18n[cat] || cat)}</option>`).join('');
             
             root.innerHTML = `
                 <div class="max-w-6xl mx-auto px-4 py-8">
@@ -1025,7 +904,7 @@ function renderPage(page) {
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                ${reservations.length ? resList : `<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500 font-bold">${currentLang === 'zh' ? '目前尚無 any 預約' : 'No reservations yet'}</td></tr>`}
+                                ${reservations.length ? resList : `<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500 font-bold">${currentLang === 'zh' ? '目前尚無任何預約' : 'No reservations yet'}</td></tr>`}
                             </tbody>
                         </table>
                     </div>
@@ -1036,16 +915,12 @@ function renderPage(page) {
     lucide.createIcons();
     if (page === 'home') {
         setTimeout(() => {
-            try {
-                initCarousel();
-            } catch(e) {
-                console.error('Carousel reinit error:', e);
-            }
+            try { initCarousel(); } catch(e) { console.error('Carousel reinit error:', e); }
         }, 100);
     }
 }
 
-// --- 5. 資料操作、輔助邏輯與特效 ---
+// --- 4. 資料操作、輔助邏輯與特效 ---
 
 function performSearch() {
     const input = document.getElementById('searchInput');
@@ -1118,7 +993,6 @@ function deleteGame(id) {
     }
 }
 
-// 修正後的預約管理取消邏輯
 function deleteReservation(id) {
     if(confirm(currentLang === 'zh' ? "確定取消？" : "Are you sure you want to cancel?")) {
         reservations = reservations.filter(r => r.id !== id);
@@ -1397,18 +1271,22 @@ function openGameModal(id) {
     const modal = document.getElementById('gameModalOverlay');
     const body = document.getElementById('gameModalBody');
     
+    // 🌟 彈出視窗也套用分類與人數翻譯
+    const displayCat = currentLang === 'zh' ? game.category : (i18n[game.category] || game.category);
+    const displayPlayers = currentLang === 'zh' ? game.players : game.players.replace('人', ' Players');
+    
     body.innerHTML = `
         <div class="relative">
             <img src="${game.image}" class="w-full h-64 object-cover rounded-t-lg" onerror="this.src='https://via.placeholder.com/600x400?text=Game'">
             <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 text-white">
                 <h3 class="text-3xl font-bold">${game.name}</h3>
-                <span class="text-sm bg-indigo-600 px-2 py-1 rounded ml-2">${game.category}</span>
+                <span class="text-sm bg-indigo-600 px-2 py-1 rounded ml-2">${displayCat}</span>
             </div>
         </div>
         <div class="p-6">
             <div class="flex items-center text-gray-500 mb-4">
                 <i data-lucide="users" class="w-5 h-5 mr-2"></i>
-                <span class="font-medium">${currentLang === 'zh' ? '建議人數：' : 'Players: '}${game.players}</span>
+                <span class="font-medium">${currentLang === 'zh' ? '建議人數：' : 'Players: '}${displayPlayers}</span>
             </div>
             <div class="prose max-w-none text-gray-700 leading-relaxed">
                 <h4 class="font-bold text-lg mb-2 text-indigo-900">${currentLang === 'zh' ? '遊戲介紹' : 'Description'}</h4>
@@ -1426,12 +1304,9 @@ function closeGameModal(e) {
 
 function toggleLang() {
     currentLang = currentLang === 'zh' ? 'en' : 'zh';
-    
-    // 1. 切換按鈕文字
     const btnText = document.getElementById('langBtnText');
     if(btnText) btnText.innerText = currentLang === 'zh' ? 'EN' : '中文';
     
-    // 2. 切換 index.html 裡的靜態文字
     document.getElementById('siteTitle').innerText = currentLang === 'zh' ? '圈圈桌遊店 - 官方網站' : 'Circle Board Games - Official Site';
     document.getElementById('navLogoText').innerText = currentLang === 'zh' ? '圈圈桌遊店' : 'Circle Board Games';
     
@@ -1444,7 +1319,11 @@ function toggleLang() {
     document.getElementById('footerContact').innerText = currentLang === 'zh' ? '聯絡方式' : 'Contact';
     document.getElementById('footerPrivacy').innerText = currentLang === 'zh' ? '隱私權政策' : 'Privacy Policy';
 
-    // 3. 重新渲染前台畫面的動態內容
+    // 🌟 修正：切換語言時，同步重置機器人的歡迎訊息
+    chatMessages = [];
+    addMessage('bot', currentLang === 'zh' ? '哈囉！我是小圈機器人，歡迎來到圈圈桌遊店。' : 'Hello! I am Circle Bot, welcome to Circle Board Games.');
+    addMessage('bot', currentLang === 'zh' ? '提示：你可以輸入「你好」、「營業時間」、「價格」、「預約」、「桌遊」得到快速回覆。' : 'Hint: Type "hello", "hours", "price", "booking", or "games" for quick replies.');
+
     renderNavbar();
     renderPage(currentPage);
 }
