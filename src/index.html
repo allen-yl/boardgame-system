@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>圈圈桌遊店 - 官方網站</title>
+    <title id="siteTitle">圈圈桌遊店 - 官方網站</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="css/style.css">
@@ -17,7 +17,7 @@
                     <div class="bg-indigo-600 text-white p-2 rounded-full mr-2">
                         <i data-lucide="gamepad-2"></i>
                     </div>
-                    <span class="font-bold text-xl text-white">圈圈桌遊店</span>
+                    <span id="navLogoText" class="font-bold text-xl text-white">圈圈桌遊店</span>
                 </div>
 
                 <div class="flex items-center gap-2 md:gap-4">
@@ -53,8 +53,8 @@
             <div class="flex items-center gap-2">
                 <i data-lucide="robot" class="w-5 h-5 text-cyan-300"></i>
                 <div>
-                    <div class="font-bold">小圈機器人</div>
-                    <div class="text-xs text-gray-300">客服助理 • 可詢問營業時間與預約</div>
+                    <div id="botNameText" class="font-bold">小圈機器人</div>
+                    <div id="botDescText" class="text-xs text-gray-300">客服助理 • 可詢問營業時間與預約</div>
                 </div>
             </div>
             <div>
@@ -82,9 +82,9 @@
     <footer class="bg-gray-800 text-gray-300 py-8 mt-auto">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <div class="flex justify-center space-x-6 mb-4">
-                <span class="hover:text-white cursor-pointer">關於我們</span>
-                <span class="hover:text-white cursor-pointer">聯絡方式</span>
-                <span class="hover:text-white cursor-pointer">隱私權政策</span>
+                <span id="footerAbout" class="hover:text-white cursor-pointer">關於我們</span>
+                <span id="footerContact" class="hover:text-white cursor-pointer">聯絡方式</span>
+                <span id="footerPrivacy" class="hover:text-white cursor-pointer">隱私權政策</span>
             </div>
             <p class="text-sm">© 2026 圈圈桌遊店 Circle Board Game Store. All rights reserved.</p>
         </div>

@@ -330,7 +330,20 @@ function renderNavbar() {
 
     let rightSide = '';
     if (currentUser) {
-        const roleLabel = role === 'admin' ? (currentLang === 'zh' ? '管理員' : 'Admin') : 'LV.' + (currentUser.level || 1) + ' ' + (currentUser.title || (currentLang === 'zh' ? '會員' : 'Member'));
+        // 🌟 新增：針對資料庫的靜態稱號進行動態翻譯
+        let displayTitle = currentUser.title || '';
+        if (currentLang === 'en') {
+            if (displayTitle === '桌遊新手') displayTitle = 'Board Game Rookie';
+            else if (displayTitle === '白銀策略家') displayTitle = 'Silver Strategist';
+            else if (displayTitle === '桌遊之神') displayTitle = 'God of Board Games';
+        } else {
+            if (displayTitle === 'Board Game Rookie') displayTitle = '桌遊新手';
+            else if (displayTitle === 'Silver Strategist') displayTitle = '白銀策略家';
+            else if (displayTitle === 'God of Board Games') displayTitle = '桌遊之神';
+        }
+
+        const roleLabel = role === 'admin' ? (currentLang === 'zh' ? '管理員' : 'Admin') : 'LV.' + (currentUser.level || 1) + ' ' + (displayTitle || (currentLang === 'zh' ? '會員' : 'Member'));
+        
         rightSide = `
             <div class="border-l pl-4 ml-4 flex items-center space-x-3">
                 <div class="flex flex-col items-end cursor-pointer hover:opacity-80 transition" onclick="navigateTo('profile')" title="進入會員中心">
@@ -519,18 +532,19 @@ function renderPage(page) {
             const today = new Date();
             const minDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
             
+            // 修正：調整底線顏色 (border-gray-600) 與按鈕高亮顏色適應深色背景
             const tabUI = `
-                <div class="flex justify-center mb-6 border-b border-gray-200">
-                    <button onclick="switchResTab('tables')" class="px-6 py-3 font-bold text-lg transition-colors ${activeTab === 'tables' ? 'text-indigo-600 border-b-4 border-indigo-600' : 'text-gray-400 hover:text-indigo-400'}">${currentLang === 'zh' ? '實時桌況預約' : 'Live Table Booking'}</button>
-                    <button onclick="switchResTab('lfg')" class="px-6 py-3 font-bold text-lg transition-colors ${activeTab === 'lfg' ? 'text-green-600 border-b-4 border-green-600' : 'text-gray-400 hover:text-green-400'}">${currentLang === 'zh' ? '線上揪團大廳' : 'Online LFG Lobby'}</button>
+                <div class="flex justify-center mb-6 border-b border-gray-600">
+                    <button onclick="switchResTab('tables')" class="px-6 py-3 font-bold text-lg transition-colors ${activeTab === 'tables' ? 'text-indigo-400 border-b-4 border-indigo-400' : 'text-gray-400 hover:text-indigo-300'}">${currentLang === 'zh' ? '實時桌況預約' : 'Live Table Booking'}</button>
+                    <button onclick="switchResTab('lfg')" class="px-6 py-3 font-bold text-lg transition-colors ${activeTab === 'lfg' ? 'text-green-400 border-b-4 border-green-400' : 'text-gray-400 hover:text-green-300'}">${currentLang === 'zh' ? '線上揪團大廳' : 'Online LFG Lobby'}</button>
                 </div>
             `;
 
             if (activeTab === 'tables') {
                 root.innerHTML = `
                     <div class="max-w-5xl mx-auto px-4 py-8 animate-fade-in">
-                        <h2 class="text-3xl font-bold mb-2 text-gray-800"><i data-lucide="layout-dashboard" class="w-8 h-8 inline mr-2 text-indigo-600"></i>${currentLang === 'zh' ? '智慧預約面板' : 'Smart Reservation Panel'}</h2>
-                        <p class="text-gray-500 mb-6">${currentLang === 'zh' ? '查看未來 4 小時實時桌況，精準鎖定您的座位。' : 'View live tables for the next 4 hours and secure your seat.'}</p>
+                        <h2 class="text-3xl font-bold mb-2 text-white"><i data-lucide="layout-dashboard" class="w-8 h-8 inline mr-2 text-indigo-400"></i>${currentLang === 'zh' ? '智慧預約面板' : 'Smart Reservation Panel'}</h2>
+                        <p class="text-gray-300 mb-6">${currentLang === 'zh' ? '查看未來 4 小時實時桌況，精準鎖定您的座位。' : 'View live tables for the next 4 hours and secure your seat.'}</p>
                         ${tabUI}
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -540,7 +554,7 @@ function renderPage(page) {
                                     <table class="w-full text-center border-collapse">
                                         <thead>
                                             <tr class="bg-gray-50 text-gray-500 text-sm">
-                                                <th class="p-3 border">桌號 \\ 時間</th>
+                                                <th class="p-3 border">${currentLang === 'zh' ? '桌號 \\ 時間' : 'Table \\ Time'}</th>
                                                 <th class="p-3 border">14:00</th>
                                                 <th class="p-3 border">15:00</th>
                                                 <th class="p-3 border">16:00</th>
@@ -638,12 +652,12 @@ function renderPage(page) {
                 root.innerHTML = `
                     <div class="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
                         <div class="flex justify-between items-center mb-2">
-                            <h2 class="text-3xl font-bold text-gray-800"><i data-lucide="users-2" class="w-8 h-8 inline mr-2 text-green-600"></i>${currentLang === 'zh' ? '線上揪團大廳 (LFG)' : 'Online LFG Lobby'}</h2>
-                            <button onclick="alert('${currentLang === 'zh' ? '實作發起揪團彈出視窗...' : 'Implement Create LFG modal...'}')" class="bg-gray-800 text-white px-4 py-2 rounded-lg font-bold hover:bg-black transition flex items-center">
+                            <h2 class="text-3xl font-bold text-white"><i data-lucide="users-2" class="w-8 h-8 inline mr-2 text-green-400"></i>${currentLang === 'zh' ? '線上揪團大廳 (LFG)' : 'Online LFG Lobby'}</h2>
+                            <button onclick="alert('${currentLang === 'zh' ? '實作發起揪團彈出視窗...' : 'Implement Create LFG modal...'}')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-indigo-500 transition flex items-center">
                                 <i data-lucide="plus" class="w-5 h-5 mr-1"></i> ${currentLang === 'zh' ? '發起揪團' : 'Start LFG'}
                             </button>
                         </div>
-                        <p class="text-gray-500 mb-6">${currentLang === 'zh' ? '找不到咖？馬上加入別人的局，系統會自動綁定桌位。' : 'Need players? Join a game and the system will auto-bind a table.'}</p>
+                        <p class="text-gray-300 mb-6">${currentLang === 'zh' ? '找不到咖？馬上加入別人的局，系統會自動綁定桌位。' : 'Need players? Join a game and the system will auto-bind a table.'}</p>
                         ${tabUI}
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -1412,8 +1426,25 @@ function closeGameModal(e) {
 
 function toggleLang() {
     currentLang = currentLang === 'zh' ? 'en' : 'zh';
+    
+    // 1. 切換按鈕文字
     const btnText = document.getElementById('langBtnText');
     if(btnText) btnText.innerText = currentLang === 'zh' ? 'EN' : '中文';
+    
+    // 2. 切換 index.html 裡的靜態文字
+    document.getElementById('siteTitle').innerText = currentLang === 'zh' ? '圈圈桌遊店 - 官方網站' : 'Circle Board Games - Official Site';
+    document.getElementById('navLogoText').innerText = currentLang === 'zh' ? '圈圈桌遊店' : 'Circle Board Games';
+    
+    document.getElementById('botNameText').innerText = currentLang === 'zh' ? '小圈機器人' : 'Circle Bot';
+    document.getElementById('botDescText').innerText = currentLang === 'zh' ? '客服助理 • 可詢問營業時間與預約' : 'Assistant • Ask about hours & booking';
+    document.getElementById('chatInput').placeholder = currentLang === 'zh' ? '輸入訊息並按 Enter 或按送出' : 'Type a message and press Enter...';
+    document.getElementById('chatSendBtn').innerText = currentLang === 'zh' ? '送出' : 'Send';
+    
+    document.getElementById('footerAbout').innerText = currentLang === 'zh' ? '關於我們' : 'About Us';
+    document.getElementById('footerContact').innerText = currentLang === 'zh' ? '聯絡方式' : 'Contact';
+    document.getElementById('footerPrivacy').innerText = currentLang === 'zh' ? '隱私權政策' : 'Privacy Policy';
+
+    // 3. 重新渲染前台畫面的動態內容
     renderNavbar();
     renderPage(currentPage);
 }
