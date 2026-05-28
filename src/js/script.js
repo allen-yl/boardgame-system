@@ -64,7 +64,7 @@ const defaultGames = [
         category: "輕策略",
         players: "2-4人",
         image: "images/dr_eureka.jpg",
-        description: "玩家扮演瘋狂科學家，透過移動試管中的彩色球體來完成實驗任務。這是一款考驗手眼協調與快速反應的遊戲，適合全家大小一起玩。"
+        description: "玩家扮演瘋狂科學家，透過移動試管中的彩色球體來完成實驗任務。這是一款考驗手眼協調與快速反应的遊戲，適合全家大小一起玩。"
     },
     {
         id: 9,
@@ -127,13 +127,14 @@ let users = [];
 let reservations = [];
 let inventory = [];
 
-// 全域狀態
+// 全域狀態 (已修正重複宣告問題)
 let activeTab = 'tables'; 
 let currentUser = null; 
 let currentPage = 'home';
 let categoryFilter = '全部';
 let currentCaptcha = ''; 
 let searchQuery = ''; 
+let currentLang = 'zh'; 
 
 // --- 讀寫函數 ---
 function loadAllData() {
@@ -186,8 +187,8 @@ function init() {
     loadAllData();
     try { localStorage.removeItem('chatMessages'); } catch(e) {}
     chatMessages = [];
-    addMessage('bot', '哈囉！我是小圈機器人，歡迎來到圈圈桌遊店。');
-    addMessage('bot', '提示：你可以輸入「你好」、「營業時間」、「價格」、「預約」、「桌遊」得到快速回覆。');
+    addMessage('bot', currentLang === 'zh' ? '哈囉！我是小圈機器人，歡迎來到圈圈桌遊店。' : 'Hello! I am Circle Bot, welcome to Circle Board Games.');
+    addMessage('bot', currentLang === 'zh' ? '提示：你可以輸入「你好」、「營業時間」、「價格」、「預約」、「桌遊」得到快速回覆。' : 'Hint: Type "hello", "hours", "price", "booking", or "games" for quick replies.');
     
     renderNavbar();
     renderPage('home');
@@ -211,11 +212,12 @@ function login(event) {
     if (user) {
         currentUser = user;
         saveCurrentUser();
-        alert(`歡迎回來，${user.name}！身分：${user.role === 'admin' ? '管理員' : '會員'}`);
+        const roleName = user.role === 'admin' ? (currentLang === 'zh' ? '管理員' : 'Admin') : (currentLang === 'zh' ? '會員' : 'Member');
+        alert(currentLang === 'zh' ? `歡迎回來，${user.name}！身分：${roleName}` : `Welcome back, ${user.name}! Role: ${roleName}`);
         renderNavbar();
         renderPage('home');
     } else {
-        alert("帳號或密碼錯誤 (測試帳號: admin/admin 或 user/user)");
+        alert(currentLang === 'zh' ? "帳號或密碼錯誤 (測試帳號: admin/admin 或 user/user)" : "Invalid username or password");
     }
 }
 
@@ -230,7 +232,7 @@ function register(event) {
     const captchaInput = form.captcha.value;
     
     if (captchaInput !== currentCaptcha) {
-        alert("驗證碼錯誤，請重新輸入！");
+        alert(currentLang === 'zh' ? "驗證碼錯誤，請重新輸入！" : "Incorrect captcha, please try again!");
         form.captcha.value = ''; 
         refreshCaptcha();        
         form.captcha.focus();    
@@ -238,12 +240,12 @@ function register(event) {
     }
 
     if (password !== confirmPassword) {
-        alert("密碼和確認密碼不一致");
+        alert(currentLang === 'zh' ? "密碼和確認密碼不一致" : "Passwords do not match");
         return;
     }
     
     if (users.find(u => u.username === username)) {
-        alert("此帳號已被使用，請選擇其他帳號");
+        alert(currentLang === 'zh' ? "此帳號已被使用，請選擇其他帳號" : "Username already taken");
         return;
     }
     
@@ -255,14 +257,14 @@ function register(event) {
         password,
         xp: 0,
         level: 1,
-        title: "桌遊新手",
+        title: currentLang === 'zh' ? "桌遊新手" : "Board Game Rookie",
         preferences: ["派對"]
     };
     
     users.push(newUser);
     saveUsers();
     
-    alert(`註冊成功！歡迎 ${name}！`);
+    alert(currentLang === 'zh' ? `註冊成功！歡迎 ${name}！` : `Registration successful! Welcome ${name}!`);
     currentUser = newUser;
     saveCurrentUser();
     renderNavbar();
@@ -288,7 +290,7 @@ function logout() {
 
 function navigateTo(page) {
     if (!currentUser && (page === 'reservation' || page === 'profile')) {
-        alert("請先登入會員才能使用此功能！");
+        alert(currentLang === 'zh' ? "請先登入會員才能使用此功能！" : "Please login to access this feature!");
         renderPage('login');
         return;
     }
@@ -307,32 +309,34 @@ function renderNavbar() {
     const mobileMenu = document.getElementById('mobile-menu');
     const role = currentUser?.role || 'guest';
     
-    let menuItems = `<button onclick="navigateTo('home')" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-100 hover:text-indigo-700 transition">首頁</button>`;
+    const txtHome = currentLang === 'zh' ? '首頁' : 'Home';
+    let menuItems = `<button onclick="navigateTo('home')" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-100 hover:text-indigo-700 transition">${txtHome}</button>`;
 
     if (role === 'admin') {
         menuItems += `
-            <button onclick="navigateTo('admin-games')" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-100 hover:text-indigo-700 transition">桌遊管理</button>
-            <button onclick="navigateTo('admin-users')" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-100 hover:text-indigo-700 transition">會員管理</button>
-            <button onclick="navigateTo('admin-reservations')" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-100 hover:text-indigo-700 transition">預約管理</button>
+            <button onclick="navigateTo('admin-games')" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-100 hover:text-indigo-700 transition">${currentLang === 'zh' ? '桌遊管理' : 'Manage Games'}</button>
+            <button onclick="navigateTo('admin-users')" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-100 hover:text-indigo-700 transition">${currentLang === 'zh' ? '會員管理' : 'Manage Users'}</button>
+            <button onclick="navigateTo('admin-reservations')" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-100 hover:text-indigo-700 transition">${currentLang === 'zh' ? '預約管理' : 'Reservations'}</button>
             <button onclick="navigateTo('admin-inventory')" class="px-3 py-2 rounded-md text-sm font-medium text-yellow-300 hover:bg-indigo-100 hover:text-indigo-700 transition">
-                <i data-lucide="scan-line" class="w-4 h-4 inline mr-1"></i>庫存與維護
+                <i data-lucide="scan-line" class="w-4 h-4 inline mr-1"></i>${currentLang === 'zh' ? '庫存與維護' : 'Inventory'}
             </button>
         `;
     } else {
         menuItems += `
-            <button onclick="navigateTo('games')" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-100 hover:text-indigo-700 transition">桌遊清單 🎲</button>
-            <button onclick="navigateTo('reservation')" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-100 hover:text-indigo-700 transition">智慧預約 📆</button>
+            <button onclick="navigateTo('games')" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-100 hover:text-indigo-700 transition">${currentLang === 'zh' ? '桌遊清單' : 'Games'} 🎲</button>
+            <button onclick="navigateTo('reservation')" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-indigo-100 hover:text-indigo-700 transition">${currentLang === 'zh' ? '智慧預約' : 'Booking'} 📆</button>
         `;
     }
 
     let rightSide = '';
     if (currentUser) {
+        const roleLabel = role === 'admin' ? (currentLang === 'zh' ? '管理員' : 'Admin') : 'LV.' + (currentUser.level || 1) + ' ' + (currentUser.title || (currentLang === 'zh' ? '會員' : 'Member'));
         rightSide = `
             <div class="border-l pl-4 ml-4 flex items-center space-x-3">
                 <div class="flex flex-col items-end cursor-pointer hover:opacity-80 transition" onclick="navigateTo('profile')" title="進入會員中心">
                     <span class="text-sm font-bold text-yellow-300 border-b border-transparent hover:border-yellow-300">${currentUser.name}</span>
                     <span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
-                        ${role === 'admin' ? '管理員' : 'LV.' + (currentUser.level || 1) + ' ' + (currentUser.title || '會員')}
+                        ${roleLabel}
                     </span>
                 </div>
                 <button onclick="logout()" class="text-gray-300 hover:text-red-400 p-2" title="登出">
@@ -343,9 +347,9 @@ function renderNavbar() {
     } else {
         rightSide = `
             <div class="border-l pl-4 ml-4 flex items-center space-x-3">
-                <span class="text-sm text-gray-300">訪客</span>
+                <span class="text-sm text-gray-300">${currentLang === 'zh' ? '訪客' : 'Guest'}</span>
                 <button onclick="navigateTo('login')" class="flex items-center bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition text-sm">
-                    <i data-lucide="log-in" class="w-4 h-4 mr-1"></i> 登入
+                    <i data-lucide="log-in" class="w-4 h-4 mr-1"></i> ${currentLang === 'zh' ? '登入' : 'Login'}
                 </button>
             </div>
         `;
@@ -356,11 +360,11 @@ function renderNavbar() {
     if (mobileMenu) {
         mobileMenu.innerHTML = menuItems + (currentUser ? 
             `<div class="border-t pt-2 mt-2">
-                <button onclick="navigateTo('profile')" class="w-full text-left px-3 py-2 text-yellow-500 font-bold">會員中心</button>
-                <button onclick="logout()" class="w-full text-left px-3 py-2 text-red-600">登出 (${currentUser.name})</button>
+                <button onclick="navigateTo('profile')" class="w-full text-left px-3 py-2 text-yellow-500 font-bold">${currentLang === 'zh' ? '會員中心' : 'Profile'}</button>
+                <button onclick="logout()" class="w-full text-left px-3 py-2 text-red-600">${currentLang === 'zh' ? '登出' : 'Logout'} (${currentUser.name})</button>
             </div>` : 
             `<div class="border-t pt-2 mt-2">
-                <button onclick="navigateTo('login')" class="w-full text-left px-3 py-2 text-indigo-600">登入</button>
+                <button onclick="navigateTo('login')" class="w-full text-left px-3 py-2 text-indigo-600">${currentLang === 'zh' ? '登入' : 'Login'}</button>
             </div>`
         );
     }
@@ -384,10 +388,10 @@ function renderPage(page) {
                         </div>
                         <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center md:items-stretch gap-8">
                             <div class="w-full md:w-1/2 z-10 flex flex-col justify-center items-center text-center px-4 md:px-0">
-                                <h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight">圈圈桌遊店</h1>
-                                <p class="text-2xl md:text-3xl text-gray-200 mb-8 leading-relaxed">相聚，<br class="md:hidden">從一場好遊戲開始。</p>
+                                <h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight">${currentLang === 'zh' ? '圈圈桌遊店' : 'Circle Board Games'}</h1>
+                                <p class="text-2xl md:text-3xl text-gray-200 mb-8 leading-relaxed">${currentLang === 'zh' ? '相聚，<br class="md:hidden">從一場好遊戲開始。' : 'Gather around,<br class="md:hidden">start with a good game.'}</p>
                                 <button onclick="navigateTo('games')" class="bg-yellow-400 text-gray-900 px-10 py-4 rounded-full font-bold text-xl hover:bg-yellow-300 transition shadow-lg transform hover:scale-105 duration-200">
-                                    查看桌遊目錄
+                                    ${currentLang === 'zh' ? '查看桌遊目錄' : 'View Game Catalog'}
                                 </button>
                             </div>
                             <div class="w-full md:w-1/2 z-0 px-4 md:px-0 mt-8 md:mt-0">
@@ -409,24 +413,24 @@ function renderPage(page) {
                             <div class="relative inline-block p-4 bg-indigo-100 text-indigo-600 rounded-full mb-4 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white">
                                 <i data-lucide="gamepad-2" class="w-10 h-10"></i>
                             </div>
-                            <h3 class="text-2xl font-bold mb-2 group-hover:text-indigo-600 transition-colors">海量桌遊</h3>
-                            <p class="text-lg text-gray-600">超過 500 款桌遊任你挑選。</p>
+                            <h3 class="text-2xl font-bold mb-2 group-hover:text-indigo-600 transition-colors">${currentLang === 'zh' ? '海量桌遊' : 'Massive Library'}</h3>
+                            <p class="text-lg text-gray-600">${currentLang === 'zh' ? '超過 500 款桌遊任你挑選。' : 'Over 500 board games to choose from.'}</p>
                         </div>
                         <div class="group bg-white p-8 rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-3 hover:shadow-2xl hover:shadow-green-500/40 border-b-0 hover:border-b-4 border-green-500 relative overflow-hidden flex flex-col items-center text-center">
                             <div class="absolute top-0 right-0 w-24 h-24 bg-green-100 rounded-bl-full -mr-4 -mt-4 opacity-50 transition-transform group-hover:scale-150 duration-500"></div>
                             <div class="relative inline-block p-4 bg-green-100 text-green-600 rounded-full mb-4 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:bg-green-600 group-hover:text-white">
                                 <i data-lucide="users" class="w-10 h-10"></i>
                             </div>
-                            <h3 class="text-2xl font-bold mb-2 group-hover:text-green-600 transition-colors">智慧揪團</h3>
-                            <p class="text-lg text-gray-600">不怕缺咖，線上大廳直接+1。</p>
+                            <h3 class="text-2xl font-bold mb-2 group-hover:text-green-600 transition-colors">${currentLang === 'zh' ? '智慧揪團' : 'Smart LFG'}</h3>
+                            <p class="text-lg text-gray-600">${currentLang === 'zh' ? '不怕缺咖，線上大廳直接+1。' : 'Never lack players, join the online lobby.'}</p>
                         </div>
                         <div class="group bg-white p-8 rounded-xl shadow-lg transition-all duration-300 hover:-translate-y-3 hover:shadow-2xl hover:shadow-orange-500/40 border-b-0 hover:border-b-4 border-orange-500 relative overflow-hidden flex flex-col items-center text-center">
                             <div class="absolute top-0 right-0 w-24 h-24 bg-orange-100 rounded-bl-full -mr-4 -mt-4 opacity-50 transition-transform group-hover:scale-150 duration-500"></div>
                             <div class="relative inline-block p-4 bg-orange-100 text-orange-600 rounded-full mb-4 transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110 group-hover:bg-orange-600 group-hover:text-white">
                                 <i data-lucide="trophy" class="w-10 h-10"></i>
                             </div>
-                            <h3 class="text-2xl font-bold mb-2 group-hover:text-orange-600 transition-colors">戰績系統</h3>
-                            <p class="text-lg text-gray-600">累積經驗值，解鎖大師稱號。</p>
+                            <h3 class="text-2xl font-bold mb-2 group-hover:text-orange-600 transition-colors">${currentLang === 'zh' ? '戰績系統' : 'Ranking System'}</h3>
+                            <p class="text-lg text-gray-600">${currentLang === 'zh' ? '累積經驗值，解鎖大師稱號。' : 'Earn XP and unlock master titles.'}</p>
                         </div>
                     </div>
                 </div>
@@ -437,11 +441,11 @@ function renderPage(page) {
             const categories = getCategories();
             const catNav = `
                 <div class="flex flex-wrap gap-2 items-center">
-                    <span class="mr-2 text-gray-600 font-bold text-sm">分類：</span>
+                    <span class="mr-2 text-gray-600 font-bold text-sm">${currentLang === 'zh' ? '分類：' : 'Category: '}</span>
                     ${categories.map(c => `
                         <button onclick="setCategoryFilter('${c}')"
                             class="px-3 py-1 rounded-full text-sm transition ${categoryFilter === c ? 'bg-indigo-600 text-white shadow-md' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}">
-                            ${c}
+                            ${c === '全部' ? (currentLang === 'zh' ? '全部' : 'All') : c}
                         </button>
                     `).join('')}
                 </div>
@@ -465,7 +469,7 @@ function renderPage(page) {
                             <p class="text-gray-500 text-sm mb-2 flex items-center"><i data-lucide="users" class="w-3 h-3 mr-1"></i> ${game.players}</p>
                         </div>
                         <div class="flex justify-end items-center mt-4 pt-4 border-t">
-                            <span class="text-xs text-gray-400">點擊查看詳情</span>
+                            <span class="text-xs text-gray-400">${currentLang === 'zh' ? '點擊查看詳情' : 'Click for details'}</span>
                         </div>
                     </div>
                 </div>
@@ -473,22 +477,22 @@ function renderPage(page) {
             
             root.innerHTML = `
                 <div class="max-w-7xl mx-auto px-4 py-8">
-                    <h2 class="text-3xl font-bold mb-6 text-white-800 border-l-8 border-indigo-600 pl-4">桌遊清單</h2>
+                    <h2 class="text-3xl font-bold mb-6 text-white-800 border-l-8 border-indigo-600 pl-4">${currentLang === 'zh' ? '桌遊清單' : 'Board Game List'}</h2>
                     
                     <div class="bg-white p-6 rounded-xl shadow-md mb-8">
                         <div class="mb-6">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">搜尋桌遊</label>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">${currentLang === 'zh' ? '搜尋桌遊' : 'Search Games'}</label>
                             <div class="flex gap-2">
                                 <input 
                                     type="text" 
                                     id="searchInput"
                                     value="${searchQuery}" 
                                     onkeydown="if(event.key === 'Enter') performSearch()"
-                                    placeholder="輸入名稱後按 Enter 或點擊搜尋..." 
+                                    placeholder="${currentLang === 'zh' ? '輸入名稱後按 Enter 或點擊搜尋...' : 'Enter name and click search...'}" 
                                     class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
                                 >
                                 <button onclick="performSearch()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center">
-                                    <i data-lucide="search" class="w-5 h-5 mr-1"></i> 搜尋
+                                    <i data-lucide="search" class="w-5 h-5 mr-1"></i> ${currentLang === 'zh' ? '搜尋' : 'Search'}
                                 </button>
                             </div>
                         </div>
@@ -503,7 +507,7 @@ function renderPage(page) {
                         ? `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-fade-in">${gamesList}</div>`
                         : `<div class="text-center text-gray-500 py-20 bg-white rounded-xl shadow-inner">
                                 <i data-lucide="ghost" class="w-12 h-12 mx-auto mb-2 opacity-50"></i>
-                                <p>找不到符合條件的桌遊</p>
+                                <p>${currentLang === 'zh' ? '找不到符合條件的桌遊' : 'No matching games found'}</p>
                            </div>`
                     }
                 </div>
@@ -517,21 +521,21 @@ function renderPage(page) {
             
             const tabUI = `
                 <div class="flex justify-center mb-6 border-b border-gray-200">
-                    <button onclick="switchResTab('tables')" class="px-6 py-3 font-bold text-lg transition-colors ${activeTab === 'tables' ? 'text-indigo-600 border-b-4 border-indigo-600' : 'text-gray-400 hover:text-indigo-400'}">實時桌況預約</button>
-                    <button onclick="switchResTab('lfg')" class="px-6 py-3 font-bold text-lg transition-colors ${activeTab === 'lfg' ? 'text-green-600 border-b-4 border-green-600' : 'text-gray-400 hover:text-green-400'}">線上揪團大廳</button>
+                    <button onclick="switchResTab('tables')" class="px-6 py-3 font-bold text-lg transition-colors ${activeTab === 'tables' ? 'text-indigo-600 border-b-4 border-indigo-600' : 'text-gray-400 hover:text-indigo-400'}">${currentLang === 'zh' ? '實時桌況預約' : 'Live Table Booking'}</button>
+                    <button onclick="switchResTab('lfg')" class="px-6 py-3 font-bold text-lg transition-colors ${activeTab === 'lfg' ? 'text-green-600 border-b-4 border-green-600' : 'text-gray-400 hover:text-green-400'}">${currentLang === 'zh' ? '線上揪團大廳' : 'Online LFG Lobby'}</button>
                 </div>
             `;
 
             if (activeTab === 'tables') {
                 root.innerHTML = `
                     <div class="max-w-5xl mx-auto px-4 py-8 animate-fade-in">
-                        <h2 class="text-3xl font-bold mb-2 text-gray-800"><i data-lucide="layout-dashboard" class="w-8 h-8 inline mr-2 text-indigo-600"></i>智慧預約面板</h2>
-                        <p class="text-gray-500 mb-6">查看未來 4 小時實時桌況，精準鎖定您的座位。</p>
+                        <h2 class="text-3xl font-bold mb-2 text-gray-800"><i data-lucide="layout-dashboard" class="w-8 h-8 inline mr-2 text-indigo-600"></i>${currentLang === 'zh' ? '智慧預約面板' : 'Smart Reservation Panel'}</h2>
+                        <p class="text-gray-500 mb-6">${currentLang === 'zh' ? '查看未來 4 小時實時桌況，精準鎖定您的座位。' : 'View live tables for the next 4 hours and secure your seat.'}</p>
                         ${tabUI}
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                             <div class="md:col-span-2 bg-white p-6 rounded-xl shadow-md border-t-4 border-indigo-500">
-                                <h3 class="font-bold text-lg mb-4 text-gray-700">實時桌位狀態 (今日)</h3>
+                                <h3 class="font-bold text-lg mb-4 text-gray-700">${currentLang === 'zh' ? '實時桌位狀態 (今日)' : 'Live Table Status (Today)'}</h3>
                                 <div class="overflow-x-auto">
                                     <table class="w-full text-center border-collapse">
                                         <thead>
@@ -545,78 +549,77 @@ function renderPage(page) {
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td class="p-3 border font-bold bg-gray-50">A 桌 (大桌)</td>
-                                                <td class="p-3 border bg-red-100 text-red-600 text-sm font-bold">已預約</td>
-                                                <td class="p-3 border bg-red-100 text-red-600 text-sm font-bold">已預約</td>
-                                                <td class="p-3 border bg-green-50 text-green-600 text-sm cursor-pointer hover:bg-green-100" onclick="autoFillRes('A桌', '16:00')">空桌</td>
-                                                <td class="p-3 border bg-green-50 text-green-600 text-sm cursor-pointer hover:bg-green-100" onclick="autoFillRes('A桌', '17:00')">空桌</td>
+                                                <td class="p-3 border font-bold bg-gray-50">${currentLang === 'zh' ? 'A 桌 (大桌)' : 'Table A (Large)'}</td>
+                                                <td class="p-3 border bg-red-100 text-red-600 text-sm font-bold">${currentLang === 'zh' ? '已預約' : 'Booked'}</td>
+                                                <td class="p-3 border bg-red-100 text-red-600 text-sm font-bold">${currentLang === 'zh' ? '已預約' : 'Booked'}</td>
+                                                <td class="p-3 border bg-green-50 text-green-600 text-sm cursor-pointer hover:bg-green-100" onclick="autoFillRes('${currentLang === 'zh' ? 'A桌' : 'Table A'}', '16:00')">${currentLang === 'zh' ? '空桌' : 'Empty'}</td>
+                                                <td class="p-3 border bg-green-50 text-green-600 text-sm cursor-pointer hover:bg-green-100" onclick="autoFillRes('${currentLang === 'zh' ? 'A桌' : 'Table A'}', '17:00')">${currentLang === 'zh' ? '空桌' : 'Empty'}</td>
                                             </tr>
                                             <tr>
-                                                <td class="p-3 border font-bold bg-gray-50">B 桌 (小桌)</td>
-                                                <td class="p-3 border bg-green-50 text-green-600 text-sm cursor-pointer hover:bg-green-100" onclick="autoFillRes('B桌', '14:00')">空桌</td>
-                                                <td class="p-3 border bg-yellow-100 text-yellow-700 text-sm font-bold">揪團中</td>
-                                                <td class="p-3 border bg-yellow-100 text-yellow-700 text-sm font-bold">揪團中</td>
-                                                <td class="p-3 border bg-green-50 text-green-600 text-sm cursor-pointer hover:bg-green-100" onclick="autoFillRes('B桌', '17:00')">空桌</td>
+                                                <td class="p-3 border font-bold bg-gray-50">${currentLang === 'zh' ? 'B 桌 (小桌)' : 'Table B (Small)'}</td>
+                                                <td class="p-3 border bg-green-50 text-green-600 text-sm cursor-pointer hover:bg-green-100" onclick="autoFillRes('${currentLang === 'zh' ? 'B桌' : 'Table B'}', '14:00')">${currentLang === 'zh' ? '空桌' : 'Empty'}</td>
+                                                <td class="p-3 border bg-yellow-100 text-yellow-700 text-sm font-bold">${currentLang === 'zh' ? '揪團中' : 'LFG'}</td>
+                                                <td class="p-3 border bg-yellow-100 text-yellow-700 text-sm font-bold">${currentLang === 'zh' ? '揪團中' : 'LFG'}</td>
+                                                <td class="p-3 border bg-green-50 text-green-600 text-sm cursor-pointer hover:bg-green-100" onclick="autoFillRes('${currentLang === 'zh' ? 'B桌' : 'Table B'}', '17:00')">${currentLang === 'zh' ? '空桌' : 'Empty'}</td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
-                                <p class="text-xs text-gray-400 mt-4">* 點擊「空桌」可快速帶入右側預約表單。</p>
+                                <p class="text-xs text-gray-400 mt-4">* ${currentLang === 'zh' ? '點擊「空桌」可快速帶入右側預約表單。' : 'Click "Empty" to autofill the reservation form.'}</p>
                             </div>
 
                             <div class="bg-gray-50 p-6 rounded-xl shadow-inner border border-gray-200">
-                                <h3 class="font-bold text-lg mb-4 text-indigo-900">鎖定座位</h3>
+                                <h3 class="font-bold text-lg mb-4 text-indigo-900">${currentLang === 'zh' ? '鎖定座位' : 'Secure a Seat'}</h3>
                                 <form onsubmit="submitReservation(event)" class="space-y-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">日期</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">${currentLang === 'zh' ? '日期' : 'Date'}</label>
                                         <input type="date" name="date" required class="w-full px-3 py-2 border rounded-lg" min="${minDate}" value="${minDate}">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">時間</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">${currentLang === 'zh' ? '時間' : 'Time'}</label>
                                         <input type="time" id="resTime" name="time" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">預計人數</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">${currentLang === 'zh' ? '預計人數' : 'Party Size'}</label>
                                         <input type="number" name="party_size" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500" min="1" max="20" value="4" required>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">備註 (可填指定桌號)</label>
-                                        <input type="text" id="resNote" name="game" placeholder="例：指定 A 桌，想玩阿瓦隆" class="w-full px-3 py-2 border rounded-lg">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">${currentLang === 'zh' ? '備註 (可填指定桌號)' : 'Note (e.g., Table No.)'}</label>
+                                        <input type="text" id="resNote" name="game" placeholder="${currentLang === 'zh' ? '例：指定 A 桌，想玩阿瓦隆' : 'e.g., Table A, want to play Avalon'}" class="w-full px-3 py-2 border rounded-lg">
                                     </div>
-                                    <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 shadow-lg transition">確認鎖定座位</button>
+                                    <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 shadow-lg transition">${currentLang === 'zh' ? '確認鎖定座位' : 'Confirm Booking'}</button>
                                 </form>
                             </div>
                         </div>
                     </div>
                 `;
             } else {
-                // 揪團大廳畫面
                 const lfgCards = lfgPosts.map(post => {
                     const isFull = post.currentPlayers.length >= post.maxPlayers;
                     const isJoined = post.currentPlayers.includes(currentUser.name);
                     
                     let btnHTML = '';
                     if (isJoined) {
-                        btnHTML = `<button disabled class="w-full bg-gray-300 text-gray-600 py-2 rounded-lg font-bold cursor-not-allowed">已加入</button>`;
+                        btnHTML = `<button disabled class="w-full bg-gray-300 text-gray-600 py-2 rounded-lg font-bold cursor-not-allowed">${currentLang === 'zh' ? '已加入' : 'Joined'}</button>`;
                     } else if (isFull) {
-                        btnHTML = `<button disabled class="w-full bg-red-100 text-red-600 py-2 rounded-lg font-bold cursor-not-allowed">已滿團</button>`;
+                        btnHTML = `<button disabled class="w-full bg-red-100 text-red-600 py-2 rounded-lg font-bold cursor-not-allowed">${currentLang === 'zh' ? '已滿團' : 'Full'}</button>`;
                     } else {
-                        btnHTML = `<button onclick="joinLFG(${post.id})" class="w-full bg-green-500 text-white py-2 rounded-lg font-bold hover:bg-green-600 shadow transition transform hover:-translate-y-1">立即加入 (+1)</button>`;
+                        btnHTML = `<button onclick="joinLFG(${post.id})" class="w-full bg-green-500 text-white py-2 rounded-lg font-bold hover:bg-green-600 shadow transition transform hover:-translate-y-1">${currentLang === 'zh' ? '立即加入 (+1)' : 'Join (+1)'}</button>`;
                     }
 
                     return `
                         <div class="bg-white rounded-xl shadow-md border border-gray-100 p-5 flex flex-col justify-between hover:shadow-lg transition">
                             <div>
                                 <div class="flex justify-between items-start mb-3">
-                                    <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full border border-green-200">缺 ${post.maxPlayers - post.currentPlayers.length} 人</span>
+                                    <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full border border-green-200">${currentLang === 'zh' ? '缺' : 'Need'} ${post.maxPlayers - post.currentPlayers.length} ${currentLang === 'zh' ? '人' : ''}</span>
                                     <span class="text-sm text-gray-500 font-mono bg-gray-100 px-2 rounded">${post.time}</span>
                                 </div>
                                 <h3 class="font-bold text-xl text-gray-800 mb-1">${post.game}</h3>
-                                <p class="text-sm text-gray-600 mb-4 flex items-center"><i data-lucide="user" class="w-4 h-4 mr-1"></i> 主揪：${post.host}</p>
+                                <p class="text-sm text-gray-600 mb-4 flex items-center"><i data-lucide="user" class="w-4 h-4 mr-1"></i> ${currentLang === 'zh' ? '主揪：' : 'Host: '}${post.host}</p>
                                 
                                 <div class="mb-4">
                                     <div class="flex justify-between text-xs text-gray-500 mb-1">
-                                        <span>目前人數：${post.currentPlayers.length} / ${post.maxPlayers}</span>
+                                        <span>${currentLang === 'zh' ? '目前人數：' : 'Players: '}${post.currentPlayers.length} / ${post.maxPlayers}</span>
                                     </div>
                                     <div class="w-full bg-gray-200 rounded-full h-2">
                                         <div class="bg-green-500 h-2 rounded-full transition-all duration-500" style="width: ${(post.currentPlayers.length / post.maxPlayers) * 100}%"></div>
@@ -635,12 +638,12 @@ function renderPage(page) {
                 root.innerHTML = `
                     <div class="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
                         <div class="flex justify-between items-center mb-2">
-                            <h2 class="text-3xl font-bold text-gray-800"><i data-lucide="users-2" class="w-8 h-8 inline mr-2 text-green-600"></i>線上揪團大廳 (LFG)</h2>
-                            <button onclick="alert('實作發起揪團彈出視窗...')" class="bg-gray-800 text-white px-4 py-2 rounded-lg font-bold hover:bg-black transition flex items-center">
-                                <i data-lucide="plus" class="w-5 h-5 mr-1"></i> 發起揪團
+                            <h2 class="text-3xl font-bold text-gray-800"><i data-lucide="users-2" class="w-8 h-8 inline mr-2 text-green-600"></i>${currentLang === 'zh' ? '線上揪團大廳 (LFG)' : 'Online LFG Lobby'}</h2>
+                            <button onclick="alert('${currentLang === 'zh' ? '實作發起揪團彈出視窗...' : 'Implement Create LFG modal...'}')" class="bg-gray-800 text-white px-4 py-2 rounded-lg font-bold hover:bg-black transition flex items-center">
+                                <i data-lucide="plus" class="w-5 h-5 mr-1"></i> ${currentLang === 'zh' ? '發起揪團' : 'Start LFG'}
                             </button>
                         </div>
-                        <p class="text-gray-500 mb-6">找不到咖？馬上加入別人的局，系統會自動綁定桌位。</p>
+                        <p class="text-gray-500 mb-6">${currentLang === 'zh' ? '找不到咖？馬上加入別人的局，系統會自動綁定桌位。' : 'Need players? Join a game and the system will auto-bind a table.'}</p>
                         ${tabUI}
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -675,8 +678,8 @@ function renderPage(page) {
                                 ${currentUser.name[0]}
                             </div>
                             <div class="flex-1">
-                                <h2 class="text-3xl font-bold mb-1">${currentUser.name} <span class="text-lg font-normal text-indigo-200 bg-black/20 px-3 py-1 rounded-full ml-2">${currentUser.title || '會員'}</span></h2>
-                                <p class="text-indigo-100 mb-4">@${currentUser.username} • 擅長：${userPrefs.join(', ') || '無'}</p>
+                                <h2 class="text-3xl font-bold mb-1">${currentUser.name} <span class="text-lg font-normal text-indigo-200 bg-black/20 px-3 py-1 rounded-full ml-2">${currentUser.title || (currentLang === 'zh' ? '會員' : 'Member')}</span></h2>
+                                <p class="text-indigo-100 mb-4">@${currentUser.username} • ${currentLang === 'zh' ? '擅長：' : 'Prefers: '}${userPrefs.join(', ') || (currentLang === 'zh' ? '無' : 'None')}</p>
                                 
                                 <div class="flex items-center gap-3">
                                     <span class="font-bold font-mono text-xl">LV.${currentUser.level || 1}</span>
@@ -692,24 +695,24 @@ function renderPage(page) {
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
                             <div>
-                                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2 flex items-center"><i data-lucide="sparkles" class="w-5 h-5 mr-2 text-yellow-500"></i>智慧推薦 (基於您的喜好)</h3>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2 flex items-center"><i data-lucide="sparkles" class="w-5 h-5 mr-2 text-yellow-500"></i>${currentLang === 'zh' ? '智慧推薦 (基於您的喜好)' : 'Smart Recommendations'}</h3>
                                 <div class="space-y-3">
-                                    ${recHtml || '<p class="text-gray-500">多玩幾款遊戲，系統就會給您專屬推薦喔！</p>'}
+                                    ${recHtml || `<p class="text-gray-500">${currentLang === 'zh' ? '多玩幾款遊戲，系統就會給您專屬推薦喔！' : 'Play more games to get personalized recommendations!'}</p>`}
                                 </div>
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2 flex items-center"><i data-lucide="history" class="w-5 h-5 mr-2 text-indigo-500"></i>近期戰績與成就</h3>
+                                <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2 flex items-center"><i data-lucide="history" class="w-5 h-5 mr-2 text-indigo-500"></i>${currentLang === 'zh' ? '近期戰績與成就' : 'Recent Matches & Achievements'}</h3>
                                 <ul class="space-y-4">
                                     <li class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border-l-4 border-green-500">
-                                        <div><div class="font-bold text-gray-800">阿瓦隆 - 勝利</div><div class="text-xs text-gray-500">昨天 16:00</div></div>
+                                        <div><div class="font-bold text-gray-800">${currentLang === 'zh' ? '阿瓦隆 - 勝利' : 'Avalon - Victory'}</div><div class="text-xs text-gray-500">${currentLang === 'zh' ? '昨天 16:00' : 'Yesterday 16:00'}</div></div>
                                         <span class="text-green-600 font-bold">+150 XP</span>
                                     </li>
                                     <li class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border-l-4 border-gray-400">
-                                        <div><div class="font-bold text-gray-800">卡坦島 - 亞軍</div><div class="text-xs text-gray-500">上週六 14:00</div></div>
+                                        <div><div class="font-bold text-gray-800">${currentLang === 'zh' ? '卡坦島 - 亞軍' : 'Catan - 2nd Place'}</div><div class="text-xs text-gray-500">${currentLang === 'zh' ? '上週六 14:00' : 'Last Saturday 14:00'}</div></div>
                                         <span class="text-gray-600 font-bold">+50 XP</span>
                                     </li>
                                     <li class="flex justify-between items-center bg-gray-50 p-3 rounded-lg border-l-4 border-yellow-500">
-                                        <div><div class="font-bold text-gray-800">解鎖成就：【交際花】</div><div class="text-xs text-gray-500">累積參與 5 次派對遊戲</div></div>
+                                        <div><div class="font-bold text-gray-800">${currentLang === 'zh' ? '解鎖成就：【交際花】' : 'Achievement: [Social Butterfly]'}</div><div class="text-xs text-gray-500">${currentLang === 'zh' ? '累積參與 5 次派對遊戲' : 'Played 5 party games'}</div></div>
                                         <i data-lucide="award" class="w-6 h-6 text-yellow-500"></i>
                                     </li>
                                 </ul>
@@ -740,7 +743,7 @@ function renderPage(page) {
                     <td class="px-6 py-4"><span class="px-2 py-1 rounded text-xs font-bold ${statusColor}">${item.status}</span></td>
                     <td class="px-6 py-4 text-sm text-gray-500">${item.missingParts}</td>
                     <td class="px-6 py-4 text-right">
-                        <button onclick="openEditInventory('${item.id}')" class="text-indigo-600 hover:text-indigo-900 text-sm font-bold bg-indigo-50 px-3 py-1 rounded">編輯狀態</button>
+                        <button onclick="openEditInventory('${item.id}')" class="text-indigo-600 hover:text-indigo-900 text-sm font-bold bg-indigo-50 px-3 py-1 rounded">${currentLang === 'zh' ? '編輯狀態' : 'Edit'}</button>
                     </td>
                 </tr>
             `}).join('');
@@ -749,11 +752,11 @@ function renderPage(page) {
                 <div class="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
                     <div class="flex justify-between items-end mb-6">
                         <div>
-                            <h2 class="text-2xl font-bold text-white flex items-center"><i data-lucide="package-search" class="w-6 h-6 mr-2"></i>後台：智慧庫存維護</h2>
-                            <p class="text-gray-300 text-sm mt-1">追蹤桌遊損耗狀況，及時替換缺件。</p>
+                            <h2 class="text-2xl font-bold text-white flex items-center"><i data-lucide="package-search" class="w-6 h-6 mr-2"></i>${currentLang === 'zh' ? '後台：智慧庫存維護' : 'Admin: Inventory Maintenance'}</h2>
+                            <p class="text-gray-300 text-sm mt-1">${currentLang === 'zh' ? '追蹤桌遊損耗狀況，及時替換缺件。' : 'Track wear and tear, replace missing parts in time.'}</p>
                         </div>
                         <button onclick="simulateScanQR()" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold shadow-lg hover:bg-blue-700 transition flex items-center transform hover:scale-105">
-                            <i data-lucide="qr-code" class="w-5 h-5 mr-2"></i> 模擬掃描 QR 歸還
+                            <i data-lucide="qr-code" class="w-5 h-5 mr-2"></i> ${currentLang === 'zh' ? '模擬掃描 QR 歸還' : 'Simulate QR Scan Return'}
                         </button>
                     </div>
                     
@@ -761,12 +764,12 @@ function renderPage(page) {
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-100">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">資產編號</th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">遊戲名稱</th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">健康值</th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">狀態</th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">備註 / 缺件紀錄</th>
-                                    <th class="px-6 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">操作</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">${currentLang === 'zh' ? '資產編號' : 'Asset ID'}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">${currentLang === 'zh' ? '遊戲名稱' : 'Game Name'}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">${currentLang === 'zh' ? '健康值' : 'Health Status'}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">${currentLang === 'zh' ? '狀態' : 'Condition'}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">${currentLang === 'zh' ? '備註 / 缺件紀錄' : 'Notes / Missing Parts'}</th>
+                                    <th class="px-6 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">${currentLang === 'zh' ? '操作' : 'Action'}</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -779,31 +782,31 @@ function renderPage(page) {
                 <div id="invModalOverlay" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center backdrop-blur-sm">
                     <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 m-4 animate-fade-in">
                         <div class="flex justify-between items-center mb-4 border-b pb-2">
-                            <h3 class="text-xl font-bold text-gray-800" id="invModalTitle">編輯庫存狀態</h3>
+                            <h3 class="text-xl font-bold text-gray-800" id="invModalTitle">${currentLang === 'zh' ? '編輯庫存狀態' : 'Edit Inventory'}</h3>
                             <button onclick="closeEditInventory()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-6 h-6"></i></button>
                         </div>
                         <form id="invEditForm" onsubmit="saveInventoryEdit(event)" class="space-y-4">
                             <input type="hidden" id="editInvId">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">健康值 (0-100%)</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${currentLang === 'zh' ? '健康值 (0-100%)' : 'Health (0-100%)'}</label>
                                 <input type="number" id="editInvHealth" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500" min="0" max="100" required>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">狀態評估</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${currentLang === 'zh' ? '狀態評估' : 'Condition Assessment'}</label>
                                 <select id="editInvStatus" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500" required>
-                                    <option value="良好">良好 (80%以上)</option>
-                                    <option value="輕微磨損">輕微磨損 (50%-80%)</option>
-                                    <option value="缺件警告">缺件警告 (需留意)</option>
-                                    <option value="嚴重損耗">嚴重損耗 (50%以下)</option>
+                                    <option value="良好">${currentLang === 'zh' ? '良好 (80%以上)' : 'Good (>80%)'}</option>
+                                    <option value="輕微磨損">${currentLang === 'zh' ? '輕微磨損 (50%-80%)' : 'Slight Wear (50-80%)'}</option>
+                                    <option value="缺件警告">${currentLang === 'zh' ? '缺件警告 (需留意)' : 'Missing Parts (Warning)'}</option>
+                                    <option value="嚴重損耗">${currentLang === 'zh' ? '嚴重損耗 (50%以下)' : 'Severe Damage (<50%)'}</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">備註 / 缺件紀錄</label>
-                                <input type="text" id="editInvMissing" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="例如：少一個紅色木頭村莊">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${currentLang === 'zh' ? '備註 / 缺件紀錄' : 'Notes / Missing Parts'}</label>
+                                <input type="text" id="editInvMissing" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="${currentLang === 'zh' ? '例如：少一個紅色木頭村莊' : 'e.g., Missing 1 red wooden village'}">
                             </div>
                             <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
-                                <button type="button" onclick="closeEditInventory()" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-bold">取消</button>
-                                <button type="submit" class="px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg font-bold shadow-md">儲存變更</button>
+                                <button type="button" onclick="closeEditInventory()" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-bold">${currentLang === 'zh' ? '取消' : 'Cancel'}</button>
+                                <button type="submit" class="px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg font-bold shadow-md">${currentLang === 'zh' ? '儲存變更' : 'Save Changes'}</button>
                             </div>
                         </form>
                     </div>
@@ -815,22 +818,22 @@ function renderPage(page) {
             root.innerHTML = `
                 <div class="min-h-[80vh] flex items-center justify-center px-4">
                     <div class="bg-white p-8 rounded-xl shadow-xl w-full max-w-md">
-                        <h2 class="text-2xl font-bold text-center text-gray-800 mb-2">會員登入</h2>
-                        <p class="text-center text-gray-500 text-sm mb-6">歡迎回到圈圈桌遊店</p>
+                        <h2 class="text-2xl font-bold text-center text-gray-800 mb-2">${currentLang === 'zh' ? '會員登入' : 'Member Login'}</h2>
+                        <p class="text-center text-gray-500 text-sm mb-6">${currentLang === 'zh' ? '歡迎回到圈圈桌遊店' : 'Welcome back to Circle Board Games'}</p>
                         <form onsubmit="login(event)" class="space-y-6">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">帳號</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${currentLang === 'zh' ? '帳號' : 'Username'}</label>
                                 <input type="text" name="username" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" required>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">密碼</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${currentLang === 'zh' ? '密碼' : 'Password'}</label>
                                 <input type="password" name="password" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" required>
                             </div>
-                            <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition">登入</button>
+                            <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition">${currentLang === 'zh' ? '登入' : 'Login'}</button>
                         </form>
                         <div class="mt-6 text-center border-t pt-6">
-                            <p class="text-gray-600 text-sm mb-3">還沒有帳號？</p>
-                            <button onclick="navigateTo('register')" class="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition">註冊會員</button>
+                            <p class="text-gray-600 text-sm mb-3">${currentLang === 'zh' ? '還沒有帳號？' : 'No account yet?'}</p>
+                            <button onclick="navigateTo('register')" class="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition">${currentLang === 'zh' ? '註冊會員' : 'Register'}</button>
                         </div>
                     </div>
                 </div>
@@ -842,29 +845,29 @@ function renderPage(page) {
             root.innerHTML = `
                 <div class="min-h-[80vh] flex items-center justify-center px-4">
                     <div class="bg-white p-8 rounded-xl shadow-xl w-full max-w-md">
-                        <h2 class="text-2xl font-bold text-center text-gray-800 mb-2">會員註冊</h2>
-                        <p class="text-center text-gray-500 text-sm mb-6">加入圈圈桌遊店會員</p>
+                        <h2 class="text-2xl font-bold text-center text-gray-800 mb-2">${currentLang === 'zh' ? '會員註冊' : 'Member Registration'}</h2>
+                        <p class="text-center text-gray-500 text-sm mb-6">${currentLang === 'zh' ? '加入圈圈桌遊店會員' : 'Join Circle Board Games'}</p>
                         <form onsubmit="register(event)" class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">真名</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${currentLang === 'zh' ? '真名' : 'Full Name'}</label>
                                 <input type="text" name="name" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none" required>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">帳號</label>
-                                <input type="text" name="username" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none" placeholder="至少 3 個字符" required minlength="3">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${currentLang === 'zh' ? '帳號' : 'Username'}</label>
+                                <input type="text" name="username" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none" placeholder="${currentLang === 'zh' ? '至少 3 個字符' : 'At least 3 chars'}" required minlength="3">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">密碼</label>
-                                <input type="password" name="password" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none" placeholder="至少 3 個字符" required minlength="3">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${currentLang === 'zh' ? '密碼' : 'Password'}</label>
+                                <input type="password" name="password" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none" placeholder="${currentLang === 'zh' ? '至少 3 個字符' : 'At least 3 chars'}" required minlength="3">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">確認密碼</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${currentLang === 'zh' ? '確認密碼' : 'Confirm Password'}</label>
                                 <input type="password" name="confirmPassword" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none" required>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">驗證碼</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">${currentLang === 'zh' ? '驗證碼' : 'Captcha'}</label>
                                 <div class="flex gap-2 items-stretch h-11">
-                                    <input type="text" name="captcha" class="flex-1 min-w-0 px-4 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none" placeholder="輸入數字" required maxlength="4">
+                                    <input type="text" name="captcha" class="flex-1 min-w-0 px-4 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none" placeholder="${currentLang === 'zh' ? '輸入數字' : 'Enter digits'}" required maxlength="4">
                                     <div id="captchaDisplay" class="w-20 bg-gray-200 text-gray-700 rounded-lg font-mono text-xl font-bold tracking-widest flex items-center justify-center select-none border border-gray-300 transition-colors duration-200">
                                         ${currentCaptcha}
                                     </div>
@@ -873,11 +876,11 @@ function renderPage(page) {
                                     </button>
                                 </div>
                             </div>
-                            <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition mt-6">完成註冊</button>
+                            <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition mt-6">${currentLang === 'zh' ? '完成註冊' : 'Complete Registration'}</button>
                         </form>
                         <div class="mt-6 text-center border-t pt-6">
-                            <p class="text-gray-600 text-sm">已有帳號？</p>
-                            <button onclick="navigateTo('login')" class="text-indigo-600 hover:text-indigo-700 font-bold mt-2">返回登入</button>
+                            <p class="text-gray-600 text-sm">${currentLang === 'zh' ? '已有帳號？' : 'Already have an account?'}</p>
+                            <button onclick="navigateTo('login')" class="text-indigo-600 hover:text-indigo-700 font-bold mt-2">${currentLang === 'zh' ? '返回登入' : 'Back to Login'}</button>
                         </div>
                     </div>
                 </div>
@@ -890,7 +893,7 @@ function renderPage(page) {
                     <td class="px-6 py-4 font-medium">${game.name}</td>
                     <td class="px-6 py-4 text-gray-500">${game.category}</td>
                     <td class="px-6 py-4 text-right">
-                        <button onclick="deleteGame(${game.id})" class="text-red-600 hover:text-red-900 font-bold bg-red-50 px-3 py-1 rounded">刪除</button>
+                        <button onclick="deleteGame(${game.id})" class="text-red-600 hover:text-red-900 font-bold bg-red-50 px-3 py-1 rounded">${currentLang === 'zh' ? '刪除' : 'Delete'}</button>
                     </td>
                 </tr>
             `).join('');
@@ -900,26 +903,26 @@ function renderPage(page) {
             
             root.innerHTML = `
                 <div class="max-w-6xl mx-auto px-4 py-8">
-                    <h2 class="text-2xl font-bold text-white mb-6">後台：桌遊管理</h2>
+                    <h2 class="text-2xl font-bold text-white mb-6">${currentLang === 'zh' ? '後台：桌遊管理' : 'Admin: Manage Games'}</h2>
                     <div class="bg-gray-100 p-6 rounded-lg mb-8 border space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div><label class="text-xs text-gray-500">名稱</label><input id="newGameName" class="p-2 border rounded w-full focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-                            <div><label class="text-xs text-gray-500">類別</label><select id="newGameCat" class="p-2 border rounded w-full focus:ring-2 focus:ring-indigo-500 outline-none" required><option value="">請選擇</option>${categoryOptions}</select></div>
-                            <div class="md:col-span-2"><label class="text-xs text-gray-500">遊戲介紹</label><textarea id="newGameDesc" class="p-2 border rounded w-full h-20 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="請輸入簡單的遊戲介紹..."></textarea></div>
-                            <div><label class="text-xs text-gray-500">遊戲圖片 *</label><input id="newGameImage" type="file" accept="image/*" class="p-2 border rounded w-full" required></div>
+                            <div><label class="text-xs text-gray-500">${currentLang === 'zh' ? '名稱' : 'Name'}</label><input id="newGameName" class="p-2 border rounded w-full focus:ring-2 focus:ring-indigo-500 outline-none"></div>
+                            <div><label class="text-xs text-gray-500">${currentLang === 'zh' ? '類別' : 'Category'}</label><select id="newGameCat" class="p-2 border rounded w-full focus:ring-2 focus:ring-indigo-500 outline-none" required><option value="">${currentLang === 'zh' ? '請選擇' : 'Select'}</option>${categoryOptions}</select></div>
+                            <div class="md:col-span-2"><label class="text-xs text-gray-500">${currentLang === 'zh' ? '遊戲介紹' : 'Description'}</label><textarea id="newGameDesc" class="p-2 border rounded w-full h-20 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="${currentLang === 'zh' ? '請輸入簡單的遊戲介紹...' : 'Enter game description...'}"></textarea></div>
+                            <div><label class="text-xs text-gray-500">${currentLang === 'zh' ? '遊戲圖片 *' : 'Game Image *'}</label><input id="newGameImage" type="file" accept="image/*" class="p-2 border rounded w-full" required></div>
                         </div>
                         <div id="imagePreview" class="w-32 h-40 bg-gray-200 rounded border-2 border-dashed flex items-center justify-center text-gray-400 text-sm">
-                            預覽區域
+                            ${currentLang === 'zh' ? '預覽區域' : 'Preview Area'}
                         </div>
-                        <button onclick="addGame()" class="bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 shadow-md">新增桌遊</button>
+                        <button onclick="addGame()" class="bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 shadow-md">${currentLang === 'zh' ? '新增桌遊' : 'Add Game'}</button>
                     </div>
                     <div class="bg-white shadow overflow-hidden rounded-lg">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">名稱</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">類別</th>
-                                    <th class="px-6 py-3 text-right">操作</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">${currentLang === 'zh' ? '名稱' : 'Name'}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">${currentLang === 'zh' ? '類別' : 'Category'}</th>
+                                    <th class="px-6 py-3 text-right">${currentLang === 'zh' ? '操作' : 'Action'}</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -959,9 +962,9 @@ function renderPage(page) {
                     </div>
                     <div class="flex items-center gap-3">
                         <span class="px-3 py-1 rounded-full text-xs font-bold ${u.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}">
-                            ${u.role === 'admin' ? '管理員' : '會員'}
+                            ${u.role === 'admin' ? (currentLang === 'zh' ? '管理員' : 'Admin') : (currentLang === 'zh' ? '會員' : 'Member')}
                         </span>
-                        ${u.role !== 'admin' ? `<button onclick="kickMember(${u.id})" class="text-red-600 hover:text-red-800 font-bold text-sm px-3 py-1 rounded hover:bg-red-50 transition">踢除</button>` : ''}
+                        ${u.role !== 'admin' ? `<button onclick="kickMember(${u.id})" class="text-red-600 hover:text-red-800 font-bold text-sm px-3 py-1 rounded hover:bg-red-50 transition">${currentLang === 'zh' ? '踢除' : 'Kick'}</button>` : ''}
                     </div>
                 </div>
             `).join('');
@@ -969,7 +972,7 @@ function renderPage(page) {
             root.innerHTML = `
                 <div class="max-w-4xl mx-auto px-4 py-8 animate-fade-in">
                     <h2 class="text-2xl font-bold mb-6 text-white flex items-center">
-                        <i data-lucide="users" class="w-6 h-6 mr-2"></i>會員名單
+                        <i data-lucide="users" class="w-6 h-6 mr-2"></i>${currentLang === 'zh' ? '會員名單' : 'User List'}
                     </h2>
                     <div class="grid gap-2">
                         ${userList}
@@ -979,15 +982,14 @@ function renderPage(page) {
             break;
 
         case 'admin-reservations':
-            // 這裡已經修好表頭遺失、人數與備註分開顯示的 Bug 囉！
             const resList = reservations.map(r => `
                 <tr class="hover:bg-gray-50 transition">
                     <td class="px-6 py-4 whitespace-nowrap font-bold text-gray-800">${r.userName}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-gray-600">${r.date} ${r.time}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-indigo-600 font-bold">${r.party_size} 人</td>
-                    <td class="px-6 py-4 text-gray-500">${r.game || '無備註'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-indigo-600 font-bold">${r.party_size} ${currentLang === 'zh' ? '人' : ''}</td>
+                    <td class="px-6 py-4 text-gray-500">${r.game || (currentLang === 'zh' ? '無備註' : 'No Note')}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-right">
-                        <button onclick="deleteReservation(${r.id})" class="text-red-600 hover:text-red-900 font-bold bg-red-50 px-3 py-1 rounded transition">取消預約</button>
+                        <button onclick="deleteReservation(${r.id})" class="text-red-600 hover:text-red-900 font-bold bg-red-50 px-3 py-1 rounded transition">${currentLang === 'zh' ? '取消預約' : 'Cancel'}</button>
                     </td>
                 </tr>
             `).join('');
@@ -995,21 +997,21 @@ function renderPage(page) {
             root.innerHTML = `
                 <div class="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
                     <h2 class="text-2xl font-bold mb-6 text-white flex items-center">
-                        <i data-lucide="calendar-check" class="w-6 h-6 mr-2"></i> 後台：預約管理
+                        <i data-lucide="calendar-check" class="w-6 h-6 mr-2"></i> ${currentLang === 'zh' ? '後台：預約管理' : 'Admin: Reservations'}
                     </h2>
                     <div class="bg-white shadow-lg overflow-hidden rounded-xl border border-gray-200">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-100">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">預約會員</th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">預約時間</th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">預計人數</th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">備註 (桌號/遊戲)</th>
-                                    <th class="px-6 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">操作</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">${currentLang === 'zh' ? '預約會員' : 'User'}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">${currentLang === 'zh' ? '預約時間' : 'Time'}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">${currentLang === 'zh' ? '預計人數' : 'Party Size'}</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">${currentLang === 'zh' ? '備註 (桌號/遊戲)' : 'Note'}</th>
+                                    <th class="px-6 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">${currentLang === 'zh' ? '操作' : 'Action'}</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                ${reservations.length ? resList : '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500 font-bold">目前尚無任何預約</td></tr>'}
+                                ${reservations.length ? resList : `<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500 font-bold">${currentLang === 'zh' ? '目前尚無 any 預約' : 'No reservations yet'}</td></tr>`}
                             </tbody>
                         </table>
                     </div>
@@ -1050,11 +1052,11 @@ function submitReservation(e) {
         date: formData.get('date'),
         time: formData.get('time'),
         party_size: formData.get('party_size') ? parseInt(formData.get('party_size'), 10) : null,
-        game: formData.get('game') || '不指定'
+        game: formData.get('game') || (currentLang === 'zh' ? '不指定' : 'Not specified')
     };
     reservations.push(newRes);
     saveReservations(); 
-    alert("預約申請已送出！");
+    alert(currentLang === 'zh' ? "預約申請已送出！" : "Reservation request submitted!");
     navigateTo('home');
 }
 
@@ -1064,8 +1066,8 @@ function addGame() {
     const desc = document.getElementById('newGameDesc').value; 
     const imageInput = document.getElementById('newGameImage');
     
-    if(!name) return alert("請輸入名稱");
-    if(!imageInput.files || !imageInput.files[0]) return alert("請上傳遊戲圖片");
+    if(!name) return alert(currentLang === 'zh' ? "請輸入名稱" : "Please enter a name");
+    if(!imageInput.files || !imageInput.files[0]) return alert(currentLang === 'zh' ? "請上傳遊戲圖片" : "Please upload a game image");
     
     const file = imageInput.files[0];
     const reader = new FileReader();
@@ -1077,33 +1079,34 @@ function addGame() {
             name, 
             category,
             players: "2-4人",
-            description: desc || "暫無介紹", 
+            description: desc || (currentLang === 'zh' ? "暫無介紹" : "No description"), 
             image: imageData 
         });
         saveGames();
-        alert("新增成功！");
+        alert(currentLang === 'zh' ? "新增成功！" : "Successfully added!");
         document.getElementById('newGameName').value = '';
         document.getElementById('newGameCat').value = '';
         document.getElementById('newGameDesc').value = '';
         document.getElementById('newGameImage').value = '';
-        document.getElementById('imagePreview').innerHTML = '預覽區域';
+        document.getElementById('imagePreview').innerHTML = currentLang === 'zh' ? '預覽區域' : 'Preview Area';
         renderPage('admin-games');
     };
     
-    reader.onerror = function() { alert("讀取圖片失敗，請重試"); };
+    reader.onerror = function() { alert(currentLang === 'zh' ? "讀取圖片失敗，請重試" : "Failed to read image, please try again"); };
     reader.readAsDataURL(file);
 }
 
 function deleteGame(id) {
-    if(confirm("確定刪除？")) {
+    if(confirm(currentLang === 'zh' ? "確定刪除？" : "Are you sure you want to delete?")) {
         games = games.filter(g => g.id !== id);
         saveGames(); 
         renderPage('admin-games');
     }
 }
 
+// 修正後的預約管理取消邏輯
 function deleteReservation(id) {
-    if(confirm("確定取消？")) {
+    if(confirm(currentLang === 'zh' ? "確定取消？" : "Are you sure you want to cancel?")) {
         reservations = reservations.filter(r => r.id !== id);
         saveReservations(); 
         renderPage('admin-reservations');
@@ -1114,7 +1117,7 @@ function kickMember(id) {
     const member = users.find(u => u.id === id);
     if(!member) return;
     
-    if(confirm(`確定要踢除會員 ${member.name} 嗎？`)) {
+    if(confirm(currentLang === 'zh' ? `確定要踢除會員 ${member.name} 嗎？` : `Are you sure you want to kick member ${member.name}?`)) {
         users = users.filter(u => u.id !== id);
         saveUsers();
         if (currentUser && currentUser.id === id) {
@@ -1140,11 +1143,11 @@ function openEditInventory(id) {
     
     const statusSelect = document.getElementById('editInvStatus');
     Array.from(statusSelect.options).forEach(opt => {
-        if (opt.value === item.status) opt.selected = true;
+        if (opt.value === item.status || opt.value.includes(item.status)) opt.selected = true;
     });
     
     document.getElementById('editInvMissing').value = item.missingParts === '無' ? '' : item.missingParts;
-    document.getElementById('invModalTitle').innerText = `更新 ${item.gameName} (#${item.boxNo})`;
+    document.getElementById('invModalTitle').innerText = currentLang === 'zh' ? `更新 ${item.gameName} (#${item.boxNo})` : `Update ${item.gameName} (#${item.boxNo})`;
     
     document.getElementById('invModalOverlay').classList.remove('hidden');
     lucide.createIcons();
@@ -1168,7 +1171,7 @@ function saveInventoryEdit(e) {
         inventory[index].missingParts = missing || "無";
         
         saveInventory(); 
-        alert('📦 庫存狀態已成功更新！');
+        alert(currentLang === 'zh' ? '📦 庫存狀態已成功更新！' : '📦 Inventory status updated successfully!');
         closeEditInventory();
         renderPage('admin-inventory'); 
     }
@@ -1184,29 +1187,29 @@ function autoFillRes(table, time) {
     const noteInput = document.getElementById('resNote');
     if (timeInput) timeInput.value = time;
     if (noteInput) {
-        noteInput.value = `指定 ${table}`;
+        noteInput.value = currentLang === 'zh' ? `指定 ${table}` : `Request ${table}`;
         noteInput.classList.add('ring-2', 'ring-green-400', 'bg-green-50');
         setTimeout(() => { noteInput.classList.remove('ring-2', 'ring-green-400', 'bg-green-50'); }, 500);
     }
 }
 
 function joinLFG(postId) {
-    if (!currentUser) return alert("請先登入！");
+    if (!currentUser) return alert(currentLang === 'zh' ? "請先登入！" : "Please login first!");
     const post = lfgPosts.find(p => p.id === postId);
     if (!post) return;
-    if (post.currentPlayers.length >= post.maxPlayers) return alert("此團已滿！");
-    if (confirm(`確定要加入【${post.host}】開的《${post.game}》嗎？`)) {
+    if (post.currentPlayers.length >= post.maxPlayers) return alert(currentLang === 'zh' ? "此團已滿！" : "This group is full!");
+    if (confirm(currentLang === 'zh' ? `確定要加入【${post.host}】開的《${post.game}》嗎？` : `Are you sure you want to join ${post.host}'s game of ${post.game}?`)) {
         post.currentPlayers.push(currentUser.name);
-        alert("加入成功！請準時抵達本店。");
+        alert(currentLang === 'zh' ? "加入成功！請準時抵達本店。" : "Successfully joined! Please arrive on time.");
         renderPage('reservation');
     }
 }
 
 function simulateScanQR() {
-    const check = confirm("📷 已開啟相機。請對準桌遊盒上的 QR Code...");
+    const check = confirm(currentLang === 'zh' ? "📷 已開啟相機。請對準桌遊盒上的 QR Code..." : "📷 Camera opened. Please point at the QR Code on the box...");
     if (check) {
         setTimeout(() => {
-            alert("掃描成功！\n資產編號：INV-004\n系統偵測：重量異常減輕，請清點「璀璨寶石」盲籌數量。");
+            alert(currentLang === 'zh' ? "掃描成功！\n資產編號：INV-004\n系統偵測：重量異常減輕，請清點「璀璨寶石」盲籌數量。" : "Scan successful!\nAsset ID: INV-004\nWarning: Abnormal weight reduction detected. Please check the chips.");
         }, 800);
     }
 }
@@ -1272,12 +1275,21 @@ function sendUserMessage(text) {
 function botRespond(userText) {
     const t = String(userText).toLowerCase();
     let reply = '';
-    if (/你好|hi|哈囉|嗨/.test(t)) reply = '哈囉！我是小圈機器人，有什麼我可以幫忙的嗎？';
-    else if (/營業|時間|營業時間/.test(t)) reply = '營業時間：12:00 - 22:00，歡迎來電或線上預約。';
-    else if (/價格|費用|多少/.test(t)) reply = '費用：每小時 $70。';
-    else if (/預約|預定/.test(t)) reply = '你可以點選「線上預約」頁面，選擇日期與人數完成預約。';
-    else if (/遊戲|桌遊/.test(t)) reply = '我們提供策略、派對、陣營等不同類型桌遊，可至「桌遊清單」查看。';
-    else reply = '抱歉，我還在學習中。若需要真人客服請使用聯絡方式。';
+    if (currentLang === 'zh') {
+        if (/你好|hi|哈囉|嗨/.test(t)) reply = '哈囉！我是小圈機器人，有什麼我可以幫忙的嗎？';
+        else if (/營業|時間|營業時間/.test(t)) reply = '營業時間：12:00 - 22:00，歡迎來電或線上預約。';
+        else if (/價格|費用|多少/.test(t)) reply = '費用：每小時 $70。';
+        else if (/預約|預定/.test(t)) reply = '你可以點選「線上預約」頁面，選擇日期與人數完成預約。';
+        else if (/遊戲|桌遊/.test(t)) reply = '我們提供策略、派對、陣營等不同類型桌遊，可至「桌遊清單」查看。';
+        else reply = '抱歉，我還在學習中。若需要真人客服請使用聯絡方式。';
+    } else {
+        if (/hello|hi|hey/.test(t)) reply = 'Hello! I am Circle Bot, how can I help you?';
+        else if (/hours|time|open/.test(t)) reply = 'Opening hours: 12:00 - 22:00. Feel free to book online.';
+        else if (/price|cost|how much/.test(t)) reply = 'Price: $70 per hour.';
+        else if (/book|reservation|reserve/.test(t)) reply = 'You can click on the "Booking" page to reserve a table.';
+        else if (/game|board game/.test(t)) reply = 'We offer strategy, party, and social deduction games. Check the "Games" list!';
+        else reply = 'Sorry, I am still learning. Please use our contact form for human support.';
+    }
     addMessage('bot', reply);
 }
 
@@ -1382,11 +1394,11 @@ function openGameModal(id) {
         <div class="p-6">
             <div class="flex items-center text-gray-500 mb-4">
                 <i data-lucide="users" class="w-5 h-5 mr-2"></i>
-                <span class="font-medium">建議人數：${game.players}</span>
+                <span class="font-medium">${currentLang === 'zh' ? '建議人數：' : 'Players: '}${game.players}</span>
             </div>
             <div class="prose max-w-none text-gray-700 leading-relaxed">
-                <h4 class="font-bold text-lg mb-2 text-indigo-900">遊戲介紹</h4>
-                <p>${game.description || "暫無詳細介紹。"}</p>
+                <h4 class="font-bold text-lg mb-2 text-indigo-900">${currentLang === 'zh' ? '遊戲介紹' : 'Description'}</h4>
+                <p>${game.description || (currentLang === 'zh' ? "暫無詳細介紹。" : "No description available.")}</p>
             </div>
         </div>
     `;
@@ -1396,6 +1408,14 @@ function openGameModal(id) {
 
 function closeGameModal(e) {
     if (!e || e.target.id === 'gameModalOverlay' || !e.target) { document.getElementById('gameModalOverlay').classList.remove('open'); }
+}
+
+function toggleLang() {
+    currentLang = currentLang === 'zh' ? 'en' : 'zh';
+    const btnText = document.getElementById('langBtnText');
+    if(btnText) btnText.innerText = currentLang === 'zh' ? 'EN' : '中文';
+    renderNavbar();
+    renderPage(currentPage);
 }
 
 init();
